@@ -15,9 +15,9 @@ public class ContentDTO extends AbstractDTO {
 	@NotNull
 	private Integer subGroup;
 	@NotNull
-	private Integer frame;
+	private String frame;
 	@NotNull
-	private Integer location;
+	private String location;
 	@NotNull
 	private String disciplineName;
 	@NotNull
