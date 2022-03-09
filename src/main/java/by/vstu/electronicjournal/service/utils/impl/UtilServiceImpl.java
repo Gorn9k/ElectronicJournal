@@ -49,13 +49,7 @@ public class UtilServiceImpl implements UtilService {
 
 	@Override
 	public void generate() {
-		List<JournalSite> sites = new ArrayList<>();
-
-		sites = journalSiteService.generate(sites);
-
-		sites = journalHeaderService.generate(sites);
-
-		journalContentService.generate(sites);
+		journalContentService.generate(journalHeaderService.generate(journalSiteService.generate()));
 	}
 
 	@Scheduled(cron = "0 0 7 * * *")
