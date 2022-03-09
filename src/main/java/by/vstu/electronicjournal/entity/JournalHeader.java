@@ -30,8 +30,9 @@ public class JournalHeader extends AbstractEntity {
     @JoinColumn(name = "journal_site_id")
     private JournalSite journalSite;
 
-    @Column(name = "sub_group")
-    private Integer subGroup;
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "sub_group_id")
+    private SubGroup subGroup;
 
     @Column(name = "class_topic")
     private String classTopic;
