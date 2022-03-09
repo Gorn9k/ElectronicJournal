@@ -5,10 +5,7 @@ import by.vstu.electronicjournal.dto.GroupDTO;
 import by.vstu.electronicjournal.dto.JournalSiteDTO;
 import by.vstu.electronicjournal.dto.TeacherDTO;
 import by.vstu.electronicjournal.dto.requestBodyParams.PatternDTO;
-import by.vstu.electronicjournal.entity.Discipline;
-import by.vstu.electronicjournal.entity.Group;
-import by.vstu.electronicjournal.entity.JournalSite;
-import by.vstu.electronicjournal.entity.Teacher;
+import by.vstu.electronicjournal.entity.*;
 import by.vstu.electronicjournal.mapper.Mapper;
 import by.vstu.electronicjournal.repository.JournalSiteRepository;
 import by.vstu.electronicjournal.service.DisciplineService;
@@ -25,6 +22,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class JournalSiteServiceImpl
@@ -88,6 +86,14 @@ public class JournalSiteServiceImpl
         }
 
         return journalSiteRepository.saveAll(result);
+    }
+
+    @Override
+    public JournalSiteDTO getFilteredByTeacherAndGroupAndDisciplineTypeClassAndSubGroup(Long teacherId, Long groupId, Long disciplineId, Long typeClassId, Byte subGroupNumber){
+        JournalSite journalSite = journalSiteRepository.findByTeacherIdAndGroupIdAndDisciplineId(teacherId, groupId, disciplineId);
+        journalSite.setJournalHeaders(journalSite.getJournalHeaders().stream().filter(journalHeader -> journalHeader.getTypeClass().getId().equals(typeClassId) &&
+                journalHeader.getSubGroup().getSubGroupNumber().equals(subGroupNumber)).collect(Collectors.toList()));
+        return (JournalSiteDTO) mapper.toDTO(journalSite, JournalSiteDTO.class);
     }
 
     private String parsingFIOTeacher(String fio) {

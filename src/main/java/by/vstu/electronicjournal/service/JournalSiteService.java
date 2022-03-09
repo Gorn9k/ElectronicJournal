@@ -26,4 +26,7 @@ public interface JournalSiteService extends CRUDService<JournalSiteDTO>, RSQLSea
      * @deprecated
      */
     List<JournalSite> generate();
+
+    JournalSiteDTO getFilteredByTeacherAndGroupAndDisciplineTypeClassAndSubGroup(Long teacherId, Long groupId, Long disciplineId, Long typeClassId,
+                                                                                 Byte subGroupNumber);
 }
