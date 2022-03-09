@@ -28,8 +28,9 @@ public class Student extends AbstractEntity {
     @Column(name = "patronymic")
     private String patronymic;
 
-    @Column(name = "sub_group")
-    private Integer subGroup;
+    @ManyToOne
+    @JoinColumn(name = "sub_group_id")
+    private SubGroup subGroup;
 
     @Column(name = "id_from_source")
     private Long idFromSource;

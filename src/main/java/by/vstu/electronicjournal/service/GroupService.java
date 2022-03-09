@@ -17,4 +17,6 @@ public interface GroupService
      * @return list of changes
      */
     List<GroupDTO> search(String query);
+
+
 }

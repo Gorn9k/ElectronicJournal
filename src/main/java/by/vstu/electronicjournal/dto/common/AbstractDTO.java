@@ -7,7 +7,5 @@ import javax.persistence.MappedSuperclass;
 @MappedSuperclass
 @Data
 public class AbstractDTO {
-
     private Long id;
-
 }
