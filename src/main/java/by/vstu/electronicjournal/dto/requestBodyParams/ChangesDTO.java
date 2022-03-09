@@ -11,7 +11,7 @@ public class ChangesDTO extends AbstractDTO {
     private LocalDate canceled;
     private LocalDate postponed;
     private String teacherFio;
-    private Integer frame;
-    private Integer location;
+    private String frame;
+    private String location;
     private Long contentId;
 }
