@@ -60,7 +60,7 @@ public class JournalContentServiceImpl
     public void generate(JournalHeader header) {
         String query = String.format("group.name==%s;subGroupIdentificator=", header.getJournalSite().getGroup().getName());
 
-        if (header.getSubGroup().getSubGroupNumber() == 0) {
+        if (header.getSubGroup() == 0) {
             query += "in=(1,2)";
         } else {
             query += "=" + header.getSubGroup();

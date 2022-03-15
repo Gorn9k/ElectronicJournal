@@ -1,7 +1,6 @@
 package by.vstu.electronicjournal.dto.requestBodyParams;
 
 import by.vstu.electronicjournal.dto.common.AbstractDTO;
-import by.vstu.electronicjournal.entity.SubGroup;
 import com.sun.istack.NotNull;
 import java.time.LocalDate;
 import lombok.Data;
@@ -14,7 +13,7 @@ public class ContentDTO extends AbstractDTO {
 	@NotNull
 	private Integer lessonNumber;
 	@NotNull
-	private SubGroup subGroup;
+	private Integer subGroup;
 	@NotNull
 	private String frame;
 	@NotNull

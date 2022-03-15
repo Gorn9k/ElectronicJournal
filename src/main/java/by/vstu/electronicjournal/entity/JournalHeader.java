@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @AttributeOverride(name = "id", column = @Column(name = "journal_header_id"))
 public class JournalHeader extends AbstractEntity {
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "type_class_id")
     private TypeClass typeClass;
 
@@ -30,9 +30,8 @@ public class JournalHeader extends AbstractEntity {
     @JoinColumn(name = "journal_site_id")
     private JournalSite journalSite;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "sub_group_id")
-    private SubGroup subGroup;
+    @Column(name = "sub_group")
+    private Integer subGroup;
 
     @Column(name = "class_topic")
     private String classTopic;

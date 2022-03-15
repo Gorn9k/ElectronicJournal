@@ -10,6 +10,7 @@ public final class StudentFactory implements AbstractFactoryForRelatedResources<
     public Student create(StudentDTO dto) {
         Student student = new Student();
         student.setIdFromSource(dto.getId());
+        student.setSubGroup(dto.getSubGroupIdentificator());
         student.setName(dto.getName());
         student.setPatronymic(dto.getPatronymic());
         student.setSurname(dto.getSurname());

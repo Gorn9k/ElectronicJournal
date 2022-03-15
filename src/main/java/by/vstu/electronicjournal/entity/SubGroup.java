@@ -17,9 +17,4 @@ public class SubGroup extends AbstractEntity {
     @Column(name = "sub_group_number")
     private Byte subGroupNumber;
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, mappedBy = "subGroup")
-    private List<Student> students = new ArrayList<>();
-
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, mappedBy = "subGroup")
-    private List<JournalHeader> journalHeaders = new ArrayList<>();
 }
