@@ -31,9 +31,9 @@ public class JournalSiteController {
 
     @GetMapping("filter")
     public JournalSiteDTO getFilteredByTeacherAndGroupAndDisciplineAndTypeClassAndSubGroup(@RequestParam("teacher_id") Long teacherId,
-               @RequestParam("group_id") Long groupId, @RequestParam("discipline_id") Long disciplineId, @RequestParam("type_class_id") Long typeClassId,
+               @RequestParam("group_name") String groupName, @RequestParam("discipline_id") Long disciplineId, @RequestParam("type_class_id") Long typeClassId,
                @RequestParam("sub_group_number") Byte subGroupNumber) {
-        return journalSiteService.getFilteredByTeacherAndGroupAndDisciplineTypeClassAndSubGroup(teacherId, groupId, disciplineId, typeClassId, subGroupNumber);
+        return journalSiteService.getFilteredByTeacherAndGroupAndDisciplineTypeClassAndSubGroup(teacherId, groupName, disciplineId, typeClassId, subGroupNumber);
     }
 
     @PatchMapping("{id}")

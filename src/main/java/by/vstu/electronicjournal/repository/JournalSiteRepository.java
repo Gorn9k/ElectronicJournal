@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import java.util.List;
 
 public interface JournalSiteRepository extends JpaRepository<JournalSite, Long>, JpaSpecificationExecutor<JournalSite> {
-    JournalSite findByTeacherIdAndGroupIdAndDisciplineId(Long teacherId, Long groupId, Long disciplineId);
+    JournalSite findByTeacherIdAndGroupNameAndDisciplineId(Long teacherId, String groupName, Long disciplineId);
 }

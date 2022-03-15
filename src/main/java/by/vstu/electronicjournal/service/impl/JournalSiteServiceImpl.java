@@ -89,8 +89,8 @@ public class JournalSiteServiceImpl
     }
 
     @Override
-    public JournalSiteDTO getFilteredByTeacherAndGroupAndDisciplineTypeClassAndSubGroup(Long teacherId, Long groupId, Long disciplineId, Long typeClassId, Byte subGroupNumber){
-        JournalSite journalSite = journalSiteRepository.findByTeacherIdAndGroupIdAndDisciplineId(teacherId, groupId, disciplineId);
+    public JournalSiteDTO getFilteredByTeacherAndGroupAndDisciplineTypeClassAndSubGroup(Long teacherId, String groupName, Long disciplineId, Long typeClassId, Byte subGroupNumber){
+        JournalSite journalSite = journalSiteRepository.findByTeacherIdAndGroupNameAndDisciplineId(teacherId, groupName, disciplineId);
         journalSite.setJournalHeaders(journalSite.getJournalHeaders().stream().filter(journalHeader -> journalHeader.getTypeClass().getId().equals(typeClassId) &&
                 journalHeader.getSubGroup().getSubGroupNumber().equals(subGroupNumber)).collect(Collectors.toList()));
         return (JournalSiteDTO) mapper.toDTO(journalSite, JournalSiteDTO.class);
