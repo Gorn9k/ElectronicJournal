@@ -6,14 +6,12 @@ import by.vstu.electronicjournal.dto.JournalHeaderDTO;
 import by.vstu.electronicjournal.dto.JournalSiteDTO;
 import by.vstu.electronicjournal.dto.requestBodyParams.ContentDTO;
 import by.vstu.electronicjournal.dto.requestBodyParams.ParamsForCreateJournalHeader;
-import by.vstu.electronicjournal.entity.JournalSite;
 import by.vstu.electronicjournal.service.JournalContentService;
 import by.vstu.electronicjournal.service.JournalHeaderService;
 import by.vstu.electronicjournal.service.JournalSiteService;
 import by.vstu.electronicjournal.service.TypeClassService;
 import by.vstu.electronicjournal.service.utils.UtilService;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,14 +59,14 @@ public class UtilServiceImpl implements UtilService {
 		for (ContentDTO dto : getContentFromTimetable()) {
 
 			List<JournalSiteDTO> siteDTOS = journalSiteService.search(
-				String.format(
-					"discipline.name==\'%s\';teacher.surname==%s;teacher.name==%s*;teacher.patronymic==%s*;group.name==\'%s\'",
-					dto.getDisciplineName(),
-					dto.getTeacherFio().split(" ")[0],
-					dto.getTeacherFio().split(" ")[1],
-					dto.getTeacherFio().split(" ")[2],
-					dto.getGroupName()
-				)
+					String.format(
+							"discipline.name==\'%s\';teacher.surname==%s;teacher.name==%s*;teacher.patronymic==%s*;group.name==\'%s\'",
+							dto.getDisciplineName(),
+							dto.getTeacherFio().split(" ")[0],
+							dto.getTeacherFio().split(" ")[1],
+							dto.getTeacherFio().split(" ")[2],
+							dto.getGroupName()
+					)
 			);
 			for (JournalSiteDTO journalSiteDTO : siteDTOS) {
 
@@ -95,7 +93,7 @@ public class UtilServiceImpl implements UtilService {
 				journalHeaderDTO.setSubGroup(dto.getSubGroup());
 				journalHeaderDTO.setDateOfLesson(dto.getLessonDate());
 				journalHeaderDTO.setTypeClass(
-					typeClassService.validator("name==\'" + dto.getTypeClassName() + "\'").get(0));
+						typeClassService.validator("name==\'" + dto.getTypeClassName() + "\'").get(0));
 
 				params.setJournalSiteId(journalSiteDTO.getId());
 				params.setJournalHeaderDTO(journalHeaderDTO);
@@ -109,13 +107,13 @@ public class UtilServiceImpl implements UtilService {
 		RestTemplate restTemplate = new RestTemplate();
 
 		String query = String.format("%s/content/search?q=lessonDate==%s",
-			path,
-			now()
+				path,
+				now()
 		);
 		LinkedList<ContentDTO> contentDTOS =
-			restTemplate.exchange(query, HttpMethod.GET, null,
-				new ParameterizedTypeReference<LinkedList<ContentDTO>>() {
-				}).getBody();
+				restTemplate.exchange(query, HttpMethod.GET, null,
+						new ParameterizedTypeReference<LinkedList<ContentDTO>>() {
+						}).getBody();
 
 		for (ContentDTO dto : contentDTOS) {
 			if (dto.getChanges() != null) {
@@ -124,7 +122,7 @@ public class UtilServiceImpl implements UtilService {
 					continue;
 				}
 				if (dto.getChanges().getCanceled() != null && dto.getChanges().getPostponed()
-					.isEqual(null)) {
+						.isEqual(null)) {
 					contentDTOS.remove(dto);
 					continue;
 				}
@@ -132,14 +130,14 @@ public class UtilServiceImpl implements UtilService {
 		}
 
 		query = String.format("%s/content/search?q=changes.postponed==%s",
-			path,
-			now()
+				path,
+				now()
 		);
 
 		LinkedList<ContentDTO> postponedContentDTO =
-			restTemplate.exchange(query, HttpMethod.GET, null,
-				new ParameterizedTypeReference<LinkedList<ContentDTO>>() {
-				}).getBody();
+				restTemplate.exchange(query, HttpMethod.GET, null,
+						new ParameterizedTypeReference<LinkedList<ContentDTO>>() {
+						}).getBody();
 
 		contentDTOS.addAll(postponedContentDTO);
 

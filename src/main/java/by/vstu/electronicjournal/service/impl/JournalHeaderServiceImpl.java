@@ -27,8 +27,8 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class JournalHeaderServiceImpl
-	extends CommonCRUDServiceImpl<JournalHeader, JournalHeaderDTO, JournalHeaderRepository>
-	implements JournalHeaderService {
+		extends CommonCRUDServiceImpl<JournalHeader, JournalHeaderDTO, JournalHeaderRepository>
+		implements JournalHeaderService {
 
 	@Value("${entrance.timetable}")
 	private String path;
@@ -61,7 +61,7 @@ public class JournalHeaderServiceImpl
 			return findAll();
 		}
 		return mapper.toDTOs(journalHeaderRepository.findAll(getSpecifications(query)),
-			JournalHeaderDTO.class);
+				JournalHeaderDTO.class);
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class JournalHeaderServiceImpl
 
 		JournalSite journalSite = journalSiteRepository.getById(params.getJournalSiteId());
 		JournalHeader journalHeader = (JournalHeader) mapper
-			.toEntity(params.getJournalHeaderDTO(), JournalHeader.class);
+				.toEntity(params.getJournalHeaderDTO(), JournalHeader.class);
 		journalHeader.setJournalSite(journalSite);
 		journalHeader = journalHeaderRepository.save(journalHeader);
 
@@ -86,16 +86,16 @@ public class JournalHeaderServiceImpl
 		for (JournalSite journalSite : params) {
 
 			String queryToCommonInfo = String.format(
-				"%s/patterns/search?q=groupName==%s;disciplineName==\'%s\';teacherFio==%s*",
-				path,
-				journalSite.getGroup().getName(),
-				journalSite.getDiscipline().getName(),
-				journalSite.getTeacher().getSurname()
+					"%s/patterns/search?q=groupName==%s;disciplineName==\'%s\';teacherFio==%s*",
+					path,
+					journalSite.getGroup().getName(),
+					journalSite.getDiscipline().getName(),
+					journalSite.getTeacher().getSurname()
 			);
 			List<PatternDTO> patternDTOS =
-				restTemplate.exchange(queryToCommonInfo, HttpMethod.GET, null,
-					new ParameterizedTypeReference<List<PatternDTO>>() {
-					}).getBody();
+					restTemplate.exchange(queryToCommonInfo, HttpMethod.GET, null,
+							new ParameterizedTypeReference<List<PatternDTO>>() {
+							}).getBody();
 
 			List<JournalHeaderDTO> headerDTOS = new ArrayList<>();
 
@@ -104,7 +104,7 @@ public class JournalHeaderServiceImpl
 				journalHeaderDTO.setSubGroup(patternDTO.getSubGroup());
 
 				TypeClassDTO typeClassDTO = typeClassService
-					.validator("name==\'" + patternDTO.getTypeClassName() + "\'").get(0);
+						.validator("name==\'" + patternDTO.getTypeClassName() + "\'").get(0);
 				journalHeaderDTO.setTypeClass(typeClassDTO);
 
 				headerDTOS.add(journalHeaderDTO);
@@ -112,7 +112,7 @@ public class JournalHeaderServiceImpl
 
 			List<JournalHeader> journalHeaders = mapper.toEntities(headerDTOS, JournalHeader.class);
 			journalHeaders.stream()
-				.forEach(journalHeader -> journalHeader.setJournalSite(journalSite));
+					.forEach(journalHeader -> journalHeader.setJournalSite(journalSite));
 			journalSite.setJournalHeaders(journalHeaderRepository.saveAll(journalHeaders));
 		}
 		return params;
@@ -128,6 +128,6 @@ public class JournalHeaderServiceImpl
 			content.setJournalHeader(header);
 		}
 		return mapper
-			.toDTOs(journalContentRepository.saveAllAndFlush(contents), JournalContentDTO.class);
+				.toDTOs(journalContentRepository.saveAllAndFlush(contents), JournalContentDTO.class);
 	}
 }
