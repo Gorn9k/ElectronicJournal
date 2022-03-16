@@ -9,5 +9,4 @@ public class TeacherDTO extends AbstractDTO {
     private String surname;
     private String name;
     private String patronymic;
-    private Long idFromSource;
 }

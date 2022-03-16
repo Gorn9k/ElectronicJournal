@@ -7,5 +7,4 @@ import lombok.Data;
 public class DisciplineDTO extends AbstractDTO {
 
     private String name;
-    private Long idFromSource;
 }
