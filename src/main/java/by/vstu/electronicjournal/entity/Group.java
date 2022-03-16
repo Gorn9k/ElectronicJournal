@@ -24,6 +24,8 @@ public class Group extends AbstractEntity {
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "group")
     private List<JournalSite> journalSites = new ArrayList<>();
 
+    /*
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "group")
     private List<Student> students = new ArrayList<>();
+    */
 }

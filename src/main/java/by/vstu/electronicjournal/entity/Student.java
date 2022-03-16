@@ -15,9 +15,10 @@ import java.util.List;
 @AttributeOverride(name = "id", column = @Column(name = "student_id"))
 public class Student extends AbstractEntity {
 
-    @ManyToOne
+    /*@ManyToOne
     @JoinColumn(name = "group_id")
     private Group group;
+    */
 
     @Column(name = "surname")
     private String surname;

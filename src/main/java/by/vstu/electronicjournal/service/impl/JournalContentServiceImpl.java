@@ -72,7 +72,7 @@ public class JournalContentServiceImpl
 
             JournalContent journalContent = new JournalContent();
             Student student = (Student) mapper.toEntity(studentDTO, Student.class);
-            student.setGroup(header.getJournalSite().getGroup());
+            //student.setGroup(header.getJournalSite().getGroup());
             journalContent.setJournalHeader(header);
             journalContent.setStudent(student);
 

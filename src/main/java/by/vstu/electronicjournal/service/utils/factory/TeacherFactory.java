@@ -2,6 +2,7 @@ package by.vstu.electronicjournal.service.utils.factory;
 
 import by.vstu.electronicjournal.dto.TeacherDTO;
 import by.vstu.electronicjournal.entity.Teacher;
+import by.vstu.electronicjournal.entity.common.Status;
 import by.vstu.electronicjournal.service.utils.AbstractFactoryForRelatedResources;
 
 public final class TeacherFactory implements AbstractFactoryForRelatedResources<Teacher, TeacherDTO> {
@@ -13,6 +14,7 @@ public final class TeacherFactory implements AbstractFactoryForRelatedResources<
         teacher.setName(dto.getName());
         teacher.setSurname(dto.getSurname());
         teacher.setPatronymic(dto.getPatronymic());
+        //teacher.setStatus(Status.valueOf(dto.getStatus()));
         return teacher;
     }
 }
