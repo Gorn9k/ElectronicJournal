@@ -19,6 +19,11 @@ public class JournalSiteController {
         return journalSiteService.search(query);
     }
 
+    @GetMapping("searchWithoutDublicate")
+    public JournalSiteDTO searchWithoutDublicate(@RequestParam("q") String query) {
+        return journalSiteService.search(query).get(0);
+    }
+
     @PostMapping
     public JournalSiteDTO create(@RequestBody JournalSiteDTO dto) {
         return journalSiteService.create(dto);

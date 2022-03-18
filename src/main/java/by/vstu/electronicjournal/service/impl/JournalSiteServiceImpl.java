@@ -92,7 +92,7 @@ public class JournalSiteServiceImpl
     public JournalSiteDTO getFilteredByTeacherAndGroupAndDisciplineTypeClassAndSubGroup(Long teacherId, String groupName, Long disciplineId, Long typeClassId, Integer subGroupNumber){
         JournalSite journalSite = journalSiteRepository.findByTeacherIdAndGroupNameAndDisciplineId(teacherId, groupName, disciplineId).get(0);
         journalSite.setJournalHeaders(journalSite.getJournalHeaders().stream().filter(journalHeader -> journalHeader.getTypeClass().getId().equals(typeClassId) &&
-                journalHeader.getSubGroup().equals(subGroupNumber)).collect(Collectors.toList()));
+                journalHeader.getSubGroup().equals(subGroupNumber) && journalHeader.getDateOfLesson()!=null).collect(Collectors.toList()));
         return (JournalSiteDTO) mapper.toDTO(journalSite, JournalSiteDTO.class);
     }
 
