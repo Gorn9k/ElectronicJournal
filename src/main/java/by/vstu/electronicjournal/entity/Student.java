@@ -18,7 +18,8 @@ public class Student extends AbstractEntity {
     /*@ManyToOne
     @JoinColumn(name = "group_id")
     private Group group;
-    */
+
+     */
 
     @Column(name = "surname")
     private String surname;

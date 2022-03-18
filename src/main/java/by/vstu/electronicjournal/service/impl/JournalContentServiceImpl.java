@@ -9,6 +9,7 @@ import by.vstu.electronicjournal.entity.Student;
 import by.vstu.electronicjournal.mapper.Mapper;
 import by.vstu.electronicjournal.repository.JournalContentRepository;
 import by.vstu.electronicjournal.repository.JournalSiteRepository;
+import by.vstu.electronicjournal.repository.StudentRepository;
 import by.vstu.electronicjournal.service.JournalContentService;
 import by.vstu.electronicjournal.service.StudentService;
 import by.vstu.electronicjournal.service.common.impl.CommonCRUDServiceImpl;
@@ -24,6 +25,9 @@ public class JournalContentServiceImpl
 
     @Autowired
     private Mapper mapper;
+
+    @Autowired
+    private StudentRepository studentRepository;
 
     @Autowired
     private JournalContentRepository journalContentRepository;
@@ -72,7 +76,7 @@ public class JournalContentServiceImpl
 
             JournalContent journalContent = new JournalContent();
             Student student = (Student) mapper.toEntity(studentDTO, Student.class);
-            //student.setGroup(header.getJournalSite().getGroup());
+           // student.setGroup(header.getJournalSite().getGroup());
             journalContent.setJournalHeader(header);
             journalContent.setStudent(student);
 
