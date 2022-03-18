@@ -12,7 +12,7 @@ public final class TypeClassFactory implements AbstractFactoryForRelatedResource
         TypeClass typeClass = new TypeClass();
         typeClass.setName(dto.getName());
         typeClass.setIdFromSource(dto.getId());
-        //typeClass.setStatus(Status.valueOf(dto.getStatus()));
+        typeClass.setStatus(dto.getStatus());
         return typeClass;
     }
 }

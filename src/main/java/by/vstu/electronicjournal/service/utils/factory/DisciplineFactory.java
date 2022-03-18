@@ -11,7 +11,7 @@ public final class DisciplineFactory implements AbstractFactoryForRelatedResourc
         Discipline discipline = new Discipline();
         discipline.setName(disciplineDTO.getName());
         discipline.setIdFromSource(disciplineDTO.getId());
-        //discipline.setStatus(Status.valueOf(disciplineDTO.getStatus()));
+        discipline.setStatus(disciplineDTO.getStatus());
         return discipline;
     }
 }

@@ -12,7 +12,7 @@ public final class GroupFactory implements AbstractFactoryForRelatedResources<Gr
         Group group = new Group();
         group.setName(dto.getName());
         group.setIdFromSource(dto.getId());
-        //group.setStatus(Status.valueOf(dto.getStatus()));
+        group.setStatus(dto.getStatus());
         return group;
     }
 }

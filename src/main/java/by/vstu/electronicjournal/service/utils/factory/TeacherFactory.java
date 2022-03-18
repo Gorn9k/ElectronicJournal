@@ -14,7 +14,7 @@ public final class TeacherFactory implements AbstractFactoryForRelatedResources<
         teacher.setName(dto.getName());
         teacher.setSurname(dto.getSurname());
         teacher.setPatronymic(dto.getPatronymic());
-        //teacher.setStatus(Status.valueOf(dto.getStatus()));
+        teacher.setStatus(dto.getStatus());
         return teacher;
     }
 }
