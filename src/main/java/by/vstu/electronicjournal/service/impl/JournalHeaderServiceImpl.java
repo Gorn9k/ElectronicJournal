@@ -8,6 +8,7 @@ import by.vstu.electronicjournal.dto.requestBodyParams.PatternDTO;
 import by.vstu.electronicjournal.entity.JournalContent;
 import by.vstu.electronicjournal.entity.JournalHeader;
 import by.vstu.electronicjournal.entity.JournalSite;
+import by.vstu.electronicjournal.entity.common.Status;
 import by.vstu.electronicjournal.mapper.Mapper;
 import by.vstu.electronicjournal.repository.JournalContentRepository;
 import by.vstu.electronicjournal.repository.JournalHeaderRepository;
@@ -103,6 +104,7 @@ public class JournalHeaderServiceImpl
 				JournalHeaderDTO journalHeaderDTO = new JournalHeaderDTO();
 				journalHeaderDTO.setSubGroup(patternDTO.getSubGroup());
 				journalHeaderDTO.setHoursCount(patternDTO.getLessonNumber());
+				journalHeaderDTO.setStatus(Status.ACTIVE);
 				TypeClassDTO typeClassDTO = typeClassService
 						.validator("name==\'" + patternDTO.getTypeClassName() + "\'").get(0);
 				journalHeaderDTO.setTypeClass(typeClassDTO);

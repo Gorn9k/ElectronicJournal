@@ -25,7 +25,7 @@ public class AbstractEntity {
     private Long id;
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private Status status;
+    private Status status = Status.ACTIVE;
     @CreatedDate
     @Column(name = "created")
     private LocalDate created;

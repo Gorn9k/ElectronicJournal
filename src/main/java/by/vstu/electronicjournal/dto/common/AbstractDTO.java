@@ -2,7 +2,6 @@ package by.vstu.electronicjournal.dto.common;
 
 import by.vstu.electronicjournal.entity.common.Status;
 import lombok.Data;
-
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.MappedSuperclass;
@@ -11,5 +10,6 @@ import javax.persistence.MappedSuperclass;
 @Data
 public class AbstractDTO {
     private Long id;
-    //private String status;
+    @Enumerated(EnumType.STRING)
+    private Status status;
 }

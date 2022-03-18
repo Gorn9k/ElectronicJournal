@@ -89,7 +89,7 @@ public class UtilServiceImpl implements UtilService {
 
 				ParamsForCreateJournalHeader params = new ParamsForCreateJournalHeader();
 				JournalHeaderDTO journalHeaderDTO = new JournalHeaderDTO();
-
+				journalHeaderDTO.setHoursCount(dto.getLessonNumber());
 				journalHeaderDTO.setSubGroup(dto.getSubGroup());
 				journalHeaderDTO.setDateOfLesson(dto.getLessonDate());
 				journalHeaderDTO.setTypeClass(

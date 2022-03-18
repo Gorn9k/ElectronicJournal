@@ -6,6 +6,7 @@ import by.vstu.electronicjournal.dto.JournalSiteDTO;
 import by.vstu.electronicjournal.dto.TeacherDTO;
 import by.vstu.electronicjournal.dto.requestBodyParams.PatternDTO;
 import by.vstu.electronicjournal.entity.*;
+import by.vstu.electronicjournal.entity.common.Status;
 import by.vstu.electronicjournal.mapper.Mapper;
 import by.vstu.electronicjournal.repository.JournalSiteRepository;
 import by.vstu.electronicjournal.service.DisciplineService;
@@ -13,6 +14,7 @@ import by.vstu.electronicjournal.service.GroupService;
 import by.vstu.electronicjournal.service.JournalSiteService;
 import by.vstu.electronicjournal.service.TeacherService;
 import by.vstu.electronicjournal.service.common.impl.CommonCRUDServiceImpl;
+import liquibase.pro.packaged.S;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -89,7 +91,7 @@ public class JournalSiteServiceImpl
             journalSite.setDiscipline((Discipline) mapper.toEntity(disciplineDTO, Discipline.class));
             journalSite.setTeacher((Teacher) mapper.toEntity(teacherDTO, Teacher.class));
             journalSite.setGroup((Group) mapper.toEntity(groupDTO, Group.class));
-
+            journalSite.setStatus(Status.ACTIVE);
             result.add(journalSite);
         }
 

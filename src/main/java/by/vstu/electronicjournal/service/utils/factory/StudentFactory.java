@@ -16,7 +16,7 @@ public final class StudentFactory implements AbstractFactoryForRelatedResources<
         student.setName(dto.getName());
         student.setPatronymic(dto.getPatronymic());
         student.setSurname(dto.getSurname());
-       // student.setStatus(Status.valueOf(dto.getStatus()));
+        student.setStatus(dto.getStatus());
         return student;
     }
 }
