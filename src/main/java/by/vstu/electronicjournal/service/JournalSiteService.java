@@ -29,4 +29,6 @@ public interface JournalSiteService extends CRUDService<JournalSiteDTO>, RSQLSea
 
     JournalSiteDTO getFilteredByTeacherAndGroupAndDisciplineTypeClassAndSubGroup(Long teacherId, String groupName, Long disciplineId, Long typeClassId,
                                                                                  Integer subGroupNumber);
+
+    List<JournalSiteDTO> searchByTeacherAndDiscipline(String query);
 }

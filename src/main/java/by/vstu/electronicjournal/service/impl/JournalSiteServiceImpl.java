@@ -20,8 +20,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,6 +56,15 @@ public class JournalSiteServiceImpl
             return findAll();
         }
         return mapper.toDTOs(journalSiteRepository.findAll(getSpecifications(query)), JournalSiteDTO.class);
+    }
+
+    @Override
+    public List<JournalSiteDTO> searchByTeacherAndDiscipline(String query){
+        Map<String, JournalSiteDTO> map = new HashMap<>();
+        search(query).forEach(journalSiteDTO -> map.put(journalSiteDTO.getGroup().getName(), journalSiteDTO));
+        List<JournalSiteDTO> journalSiteDTOS = new ArrayList<>();
+        journalSiteDTOS.addAll(map.values());
+        return journalSiteDTOS;
     }
 
     @Override
