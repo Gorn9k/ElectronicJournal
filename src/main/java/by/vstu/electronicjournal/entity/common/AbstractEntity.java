@@ -9,6 +9,7 @@ import org.springframework.data.annotation.ReadOnlyProperty;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Data
@@ -27,8 +28,8 @@ public class AbstractEntity {
     private Status status;
     @CreatedDate
     @Column(name = "created")
-    private Date created;
+    private LocalDate created;
     @LastModifiedDate
     @Column(name = "updated")
-    private Date updated;
+    private LocalDate updated;
 }

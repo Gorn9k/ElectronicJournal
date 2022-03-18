@@ -28,6 +28,9 @@ public class JournalContent extends AbstractEntity {
 	@Column(name = "presence")
 	private Boolean presence;
 
+	@Column(name = "lateness")
+	private Short lateness;
+
 	@Column(name = "grade")
 	private Integer grade;
 
