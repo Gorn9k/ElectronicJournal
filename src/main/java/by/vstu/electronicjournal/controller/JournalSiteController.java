@@ -24,6 +24,11 @@ public class JournalSiteController {
         return journalSiteService.search(query).get(0);
     }
 
+    @GetMapping("searchByTeacherAndDiscipline")
+    public List<JournalSiteDTO> searchByTeacherAndDiscipline(@RequestParam("q") String query) {
+        return journalSiteService.searchByTeacherAndDiscipline(query);
+    }
+
     @PostMapping
     public JournalSiteDTO create(@RequestBody JournalSiteDTO dto) {
         return journalSiteService.create(dto);
