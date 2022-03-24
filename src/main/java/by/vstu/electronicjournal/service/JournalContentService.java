@@ -1,6 +1,7 @@
 package by.vstu.electronicjournal.service;
 
 import by.vstu.electronicjournal.dto.JournalContentDTO;
+import by.vstu.electronicjournal.dto.StudentPerformanceDTO;
 import by.vstu.electronicjournal.entity.JournalContent;
 import by.vstu.electronicjournal.entity.JournalHeader;
 import by.vstu.electronicjournal.entity.JournalSite;
@@ -30,4 +31,6 @@ public interface JournalContentService extends CRUDService<JournalContentDTO>, R
      * This method update records of headers for
      */
     void generate(JournalHeader header);
+
+    StudentPerformanceDTO getStudentOverralGPAById(String query);
 }

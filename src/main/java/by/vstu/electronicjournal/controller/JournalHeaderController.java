@@ -1,5 +1,6 @@
 package by.vstu.electronicjournal.controller;
 
+import by.vstu.electronicjournal.dto.AcademicPerformanceDTO;
 import by.vstu.electronicjournal.dto.JournalContentDTO;
 import by.vstu.electronicjournal.dto.JournalHeaderDTO;
 import by.vstu.electronicjournal.dto.requestBodyParams.ParamsForCreateJournalHeader;
@@ -26,6 +27,11 @@ public class JournalHeaderController {
 	@GetMapping("search")
 	public List<JournalHeaderDTO> search(@RequestParam("q") String query) {
 		return JournalHeaderService.search(query);
+	}
+
+	@GetMapping("academicPerformance")
+	public AcademicPerformanceDTO getTotalNumberMissedClassesByStudentForPeriod(@RequestParam("q") String query) {
+		return JournalHeaderService.getTotalNumberMissedClassesByStudentForPeriod(query);
 	}
 
 	@PostMapping

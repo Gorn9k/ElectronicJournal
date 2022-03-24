@@ -1,9 +1,6 @@
 package by.vstu.electronicjournal.service.impl;
 
-import by.vstu.electronicjournal.dto.DisciplineDTO;
-import by.vstu.electronicjournal.dto.GroupDTO;
-import by.vstu.electronicjournal.dto.JournalSiteDTO;
-import by.vstu.electronicjournal.dto.TeacherDTO;
+import by.vstu.electronicjournal.dto.*;
 import by.vstu.electronicjournal.dto.requestBodyParams.PatternDTO;
 import by.vstu.electronicjournal.entity.*;
 import by.vstu.electronicjournal.entity.common.Status;
@@ -23,7 +20,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @Service
 public class JournalSiteServiceImpl
@@ -70,6 +71,99 @@ public class JournalSiteServiceImpl
     }
 
     @Override
+    public List<AcademicPerformanceDTO> getGeneralAcademicPerformance(String query) {
+        List<JournalSiteDTO> journalSites = search(query);
+        List<Map<StudentDTO, List<JournalContentDTO>>> mapArrayList = new ArrayList<>();
+        List<JournalHeaderDTO> journalHeaderDTOs = new ArrayList<>();
+        journalSites.forEach(journalSiteDTO -> journalHeaderDTOs.addAll(journalSiteDTO.getJournalHeaders()));
+        List<JournalContentDTO> journalContentDTOs = new ArrayList<>();
+        journalHeaderDTOs.forEach(journalHeaderDTO -> journalContentDTOs.addAll(journalHeaderDTO.getJournalContents()));
+        Set<StudentDTO> hashSet = journalContentDTOs.stream().map(JournalContentDTO::getStudent).collect(Collectors.toSet());
+        hashSet.forEach(studentDTO -> {
+            Map<StudentDTO, List<JournalContentDTO>> map1 = new HashMap<>();
+            map1.put(studentDTO, journalContentDTOs.stream().filter(journalContentDTO ->
+                    journalContentDTO.getStudent().equals(studentDTO)).collect(Collectors.toList()));
+            mapArrayList.add(map1);
+        });
+
+        List<AcademicPerformanceDTO> academicPerformanceDTOList = new ArrayList<>();
+
+        mapArrayList.forEach(studentDTOListMap -> studentDTOListMap.forEach((key, value) -> {
+            AcademicPerformanceDTO academicPerformanceDTO = new AcademicPerformanceDTO();
+            StudentPerformanceDTO studentPerformanceDTO = new StudentPerformanceDTO();
+            studentPerformanceDTO.setStudentDTO(key);
+            long count = value.stream().filter(journalContentDTO ->
+                    journalContentDTO.getGrade()!=null).count();
+            if (count != 0) {
+                studentPerformanceDTO.setOverallGPA(value.stream().mapToInt(JournalContentDTO::getGrade).average().getAsDouble());
+            }
+            count = value.stream().filter(journalContentDTO ->
+                    journalContentDTO.getPresence()!=null && journalContentDTO.getPresence().equals(false)).count();
+            if (count != 0) {
+                academicPerformanceDTO.setTotalNumberPasses(count);
+            }
+            count = value.stream().filter(journalContentDTO ->
+                    journalContentDTO.getLateness() != null && journalContentDTO.getLateness() != 0).count();
+            if (count != 0) {
+                academicPerformanceDTO.setTotalNumberLates(count);
+            }
+            academicPerformanceDTO.setStudentPerformanceDTO(studentPerformanceDTO);
+            academicPerformanceDTOList.add(academicPerformanceDTO);
+        }));
+
+        return academicPerformanceDTOList;
+    }
+
+    @Override
+    public StudentPerformanceDTO getGeneralStudentProgressInDiscipline(String query) {
+        List<JournalSiteDTO> journalSites = search(query.split(";")[0]);
+        StudentPerformanceDTO studentPerformanceDTO = new StudentPerformanceDTO();
+        if (!journalSites.isEmpty()) {
+            Long studentId = Long.parseLong(query.split(";")[1].split("==")[1]);
+            List<JournalHeaderDTO> journalHeaderDTOs = new ArrayList<>();
+            journalSites.forEach(journalSiteDTO -> journalHeaderDTOs.addAll(journalSiteDTO.getJournalHeaders()));
+            List<JournalContentDTO> journalContentDTOs = new ArrayList<>();
+            journalHeaderDTOs.forEach(journalHeaderDTO -> journalContentDTOs.addAll(journalHeaderDTO.getJournalContents()));
+            if (journalContentDTOs.stream().filter(journalContentDTO ->
+                    journalContentDTO.getStudent().getId().equals(studentId)).count()!=0) {
+                studentPerformanceDTO.setStudentDTO(journalContentDTOs.get(0).getStudent());
+                long count = journalContentDTOs.stream().filter(journalContentDTO ->
+                        journalContentDTO.getGrade() != null).count();
+                if (count != 0) {
+                    studentPerformanceDTO.setOverallGPA(journalContentDTOs.stream().mapToInt(JournalContentDTO::getGrade).average().getAsDouble());
+                }
+            }
+        }
+        return studentPerformanceDTO;
+    }
+
+    @Override
+    public AcademicPerformanceDTO getNumberMissedClassesByStudent(String query) {
+        List<JournalSiteDTO> journalSites = search(query.split(";")[0]);
+        AcademicPerformanceDTO academicPerformanceDTO = new AcademicPerformanceDTO();
+        StudentPerformanceDTO studentPerformanceDTO = new StudentPerformanceDTO();
+        if (!journalSites.isEmpty()) {
+            Long studentId = Long.parseLong(query.split(";")[1].split("==")[1]);
+            List<JournalHeaderDTO> journalHeaderDTOs = new ArrayList<>();
+            journalSites.forEach(journalSiteDTO -> journalHeaderDTOs.addAll(journalSiteDTO.getJournalHeaders()));
+            List<JournalContentDTO> journalContentDTOs = new ArrayList<>();
+            journalHeaderDTOs.forEach(journalHeaderDTO -> journalContentDTOs.addAll(journalHeaderDTO.getJournalContents()));
+            if (journalContentDTOs.stream().filter(journalContentDTO ->
+                    journalContentDTO.getStudent().getId().equals(studentId)).count()!=0) {
+                studentPerformanceDTO.setStudentDTO(journalContentDTOs.get(0).getStudent());
+                academicPerformanceDTO.setStudentPerformanceDTO(studentPerformanceDTO);
+                journalContentDTOs.stream().forEach(journalContentDTO -> journalContentDTO.setPresence(false));
+                long count = journalContentDTOs.stream().filter(journalContentDTO ->
+                        journalContentDTO.getPresence()!=null && journalContentDTO.getPresence().equals(false)).count();
+                if (count != 0) {
+                    academicPerformanceDTO.setTotalNumberPasses(count);
+                }
+            }
+        }
+        return academicPerformanceDTO;
+    }
+
+    @Override
     public List<JournalSite> generate() {
 
         RestTemplate restTemplate = new RestTemplate();
@@ -99,8 +193,8 @@ public class JournalSiteServiceImpl
     }
 
     @Override
-    public JournalSiteDTO getFilteredByTeacherAndGroupAndDisciplineTypeClassAndSubGroup(Long teacherId, String groupName, Long disciplineId, Long typeClassId, Integer subGroupNumber){
-        JournalSite journalSite = journalSiteRepository.findByTeacherIdAndGroupNameAndDisciplineId(teacherId, groupName, disciplineId).get(0);
+    public JournalSiteDTO getFilteredByTeacherAndGroupAndDisciplineTypeClassAndSubGroup(Long teacherIdFromSource, String groupName, Long disciplineId, Long typeClassId, Integer subGroupNumber){
+        JournalSite journalSite = journalSiteRepository.findByTeacherIdFromSourceAndGroupNameAndDisciplineId(teacherIdFromSource, groupName, disciplineId).get(0);
         journalSite.setJournalHeaders(journalSite.getJournalHeaders().stream().filter(journalHeader -> journalHeader.getTypeClass().getId().equals(typeClassId) &&
                 journalHeader.getSubGroup().equals(subGroupNumber) && journalHeader.getDateOfLesson()!=null).collect(Collectors.toList()));
         return (JournalSiteDTO) mapper.toDTO(journalSite, JournalSiteDTO.class);

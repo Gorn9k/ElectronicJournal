@@ -1,6 +1,8 @@
 package by.vstu.electronicjournal.service;
 
+import by.vstu.electronicjournal.dto.AcademicPerformanceDTO;
 import by.vstu.electronicjournal.dto.JournalSiteDTO;
+import by.vstu.electronicjournal.dto.StudentPerformanceDTO;
 import by.vstu.electronicjournal.entity.JournalSite;
 import by.vstu.electronicjournal.service.common.CRUDService;
 import by.vstu.electronicjournal.service.common.RSQLSearch;
@@ -27,8 +29,15 @@ public interface JournalSiteService extends CRUDService<JournalSiteDTO>, RSQLSea
      */
     List<JournalSite> generate();
 
-    JournalSiteDTO getFilteredByTeacherAndGroupAndDisciplineTypeClassAndSubGroup(Long teacherId, String groupName, Long disciplineId, Long typeClassId,
+    JournalSiteDTO getFilteredByTeacherAndGroupAndDisciplineTypeClassAndSubGroup(Long teacherIdFromSource, String groupName, Long disciplineId, Long typeClassId,
                                                                                  Integer subGroupNumber);
 
     List<JournalSiteDTO> searchByTeacherAndDiscipline(String query);
+
+    List<AcademicPerformanceDTO> getGeneralAcademicPerformance(String query);
+
+    StudentPerformanceDTO getGeneralStudentProgressInDiscipline(String query);
+
+    AcademicPerformanceDTO getNumberMissedClassesByStudent(String query);
+
 }

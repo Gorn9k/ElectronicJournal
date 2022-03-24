@@ -1,5 +1,6 @@
 package by.vstu.electronicjournal.service;
 
+import by.vstu.electronicjournal.dto.AcademicPerformanceDTO;
 import by.vstu.electronicjournal.dto.JournalContentDTO;
 import by.vstu.electronicjournal.dto.JournalHeaderDTO;
 import by.vstu.electronicjournal.dto.requestBodyParams.ParamsForCreateJournalHeader;
@@ -34,4 +35,6 @@ public interface JournalHeaderService extends CRUDService<JournalHeaderDTO>,
 	List<JournalSite> generate(List<JournalSite> params);
 
 	List<JournalContentDTO> editList(Long id, List<JournalContentDTO> dtos);
+
+	AcademicPerformanceDTO getTotalNumberMissedClassesByStudentForPeriod(String query);
 }

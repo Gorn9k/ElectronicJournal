@@ -1,5 +1,6 @@
 package by.vstu.electronicjournal.service;
 
+import by.vstu.electronicjournal.dto.AcademicPerformanceDTO;
 import by.vstu.electronicjournal.dto.StudentDTO;
 import by.vstu.electronicjournal.entity.Student;
 import by.vstu.electronicjournal.service.common.CRUDService;
@@ -18,4 +19,6 @@ public interface StudentService
      * @return list of changes
      */
     List<StudentDTO> search(String query);
+
+
 }
