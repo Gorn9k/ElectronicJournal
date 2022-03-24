@@ -21,6 +21,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -152,16 +155,17 @@ public class JournalHeaderServiceImpl
 		} catch (Exception e) {
 			System.out.println("Incorrect format date!");
 		}
-		query = String.format("dateOfLesson=in=(%s,%s)", after, before);
+		query = String.format("dateOfLesson>=%s and dateOfLesson<=%s", after, before);
 		List<JournalHeaderDTO> journalHeaderDTOs = search(query);
 		List<JournalContentDTO> journalContentDTOs = new ArrayList<>();
 		AcademicPerformanceDTO academicPerformanceDTO = new AcademicPerformanceDTO();
 		StudentPerformanceDTO studentPerformanceDTO = new StudentPerformanceDTO();
 		journalHeaderDTOs.forEach(journalHeaderDTO -> journalContentDTOs.addAll(journalHeaderDTO.getJournalContents()));
-		academicPerformanceDTO.setTotalNumberPasses(journalContentDTOs.stream().filter(journalContentDTO -> journalContentDTO.getStudent().getId().equals(studentId) &&
-				journalContentDTO.getPresence().equals(false)).count());
-		if (!journalContentDTOs.isEmpty()) {
-			studentPerformanceDTO.setStudentDTO(journalContentDTOs.get(0).getStudent());
+		List<JournalContentDTO> journalContentDTOList = journalContentDTOs.stream().filter(journalContentDTO -> journalContentDTO.getStudent().getId().equals(studentId)).collect(Collectors.toList());
+		if (journalContentDTOList.size()!=0) {
+			studentPerformanceDTO.setStudentDTO(journalContentDTOList.get(0).getStudent());
+			academicPerformanceDTO.setTotalNumberPasses(journalContentDTOList.stream().filter(journalContentDTO ->
+					journalContentDTO.getPresence()!=null && journalContentDTO.getPresence().equals(false)).count());
 		}
 		academicPerformanceDTO.setStudentPerformanceDTO(studentPerformanceDTO);
 		return academicPerformanceDTO;
