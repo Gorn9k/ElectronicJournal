@@ -29,7 +29,7 @@ public class JournalHeaderController {
 		return JournalHeaderService.search(query);
 	}
 
-	@GetMapping("academicPerformance")
+	@GetMapping("getAcademicPerformance")
 	public AcademicPerformanceDTO getTotalNumberMissedClassesByStudentForPeriod(@RequestParam("q") String query) {
 		return JournalHeaderService.getTotalNumberMissedClassesByStudentForPeriod(query);
 	}
