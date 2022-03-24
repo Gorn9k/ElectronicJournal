@@ -1,8 +1,6 @@
 package by.vstu.electronicjournal.service.impl;
 
-import by.vstu.electronicjournal.dto.JournalContentDTO;
-import by.vstu.electronicjournal.dto.JournalHeaderDTO;
-import by.vstu.electronicjournal.dto.TypeClassDTO;
+import by.vstu.electronicjournal.dto.*;
 import by.vstu.electronicjournal.dto.requestBodyParams.ParamsForCreateJournalHeader;
 import by.vstu.electronicjournal.dto.requestBodyParams.PatternDTO;
 import by.vstu.electronicjournal.entity.JournalContent;
@@ -17,7 +15,11 @@ import by.vstu.electronicjournal.service.JournalContentService;
 import by.vstu.electronicjournal.service.JournalHeaderService;
 import by.vstu.electronicjournal.service.TypeClassService;
 import by.vstu.electronicjournal.service.common.impl.CommonCRUDServiceImpl;
+
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -131,5 +133,37 @@ public class JournalHeaderServiceImpl
 		}
 		return mapper
 				.toDTOs(journalContentRepository.saveAllAndFlush(contents), JournalContentDTO.class);
+	}
+
+	@Override
+	public AcademicPerformanceDTO getTotalNumberMissedClassesByStudentForPeriod(String query) {
+		Long studentId = Long.parseLong(query.split("==")[1].split(";")[0]);
+		LocalDate after = null, before = null;
+		int year = 0, month = 0, dayOfMonth;
+		try {
+			year = Integer.parseInt(query.split("==")[2].split("and")[0].split("-")[0]);
+			month = Integer.parseInt(query.split("==")[2].split("and")[0].split("-")[1]);
+			dayOfMonth = Integer.parseInt(query.split("==")[2].split("and")[0].split("-")[2]);
+			after = LocalDate.of(year,month,dayOfMonth);
+			year = Integer.parseInt(query.split("==")[2].split("and")[1].split("-")[0]);
+			month = Integer.parseInt(query.split("==")[2].split("and")[1].split("-")[1]);
+			dayOfMonth = Integer.parseInt(query.split("==")[2].split("and")[1].split("-")[2]);
+			before = LocalDate.of(year,month,dayOfMonth);
+		} catch (Exception e) {
+			System.out.println("Incorrect format date!");
+		}
+		query = String.format("dateOfLesson=in=(%s,%s)", after, before);
+		List<JournalHeaderDTO> journalHeaderDTOs = search(query);
+		List<JournalContentDTO> journalContentDTOs = new ArrayList<>();
+		AcademicPerformanceDTO academicPerformanceDTO = new AcademicPerformanceDTO();
+		StudentPerformanceDTO studentPerformanceDTO = new StudentPerformanceDTO();
+		journalHeaderDTOs.forEach(journalHeaderDTO -> journalContentDTOs.addAll(journalHeaderDTO.getJournalContents()));
+		academicPerformanceDTO.setTotalNumberPasses(journalContentDTOs.stream().filter(journalContentDTO -> journalContentDTO.getStudent().getId().equals(studentId) &&
+				journalContentDTO.getPresence().equals(false)).count());
+		if (!journalContentDTOs.isEmpty()) {
+			studentPerformanceDTO.setStudentDTO(journalContentDTOs.get(0).getStudent());
+		}
+		academicPerformanceDTO.setStudentPerformanceDTO(studentPerformanceDTO);
+		return academicPerformanceDTO;
 	}
 }

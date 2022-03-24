@@ -1,7 +1,9 @@
 package by.vstu.electronicjournal.service.impl;
 
 import by.vstu.electronicjournal.dto.JournalContentDTO;
+import by.vstu.electronicjournal.dto.JournalSiteDTO;
 import by.vstu.electronicjournal.dto.StudentDTO;
+import by.vstu.electronicjournal.dto.StudentPerformanceDTO;
 import by.vstu.electronicjournal.entity.JournalContent;
 import by.vstu.electronicjournal.entity.JournalHeader;
 import by.vstu.electronicjournal.entity.JournalSite;
@@ -84,5 +86,20 @@ public class JournalContentServiceImpl
 
             journalContentRepository.save(journalContent);
         }
+    }
+
+    @Override
+    public StudentPerformanceDTO getStudentOverralGPAById(String query) {
+        List<JournalContentDTO> journalContentDTOs = search(query);
+        StudentPerformanceDTO studentPerformanceDTO = new StudentPerformanceDTO();
+        if (!journalContentDTOs.isEmpty()) {
+            studentPerformanceDTO.setStudentDTO(journalContentDTOs.get(0).getStudent());
+            long count = journalContentDTOs.stream().filter(journalContentDTO ->
+                    journalContentDTO.getGrade() != null).count();
+            if (count != 0) {
+                studentPerformanceDTO.setOverallGPA(journalContentDTOs.stream().mapToInt(JournalContentDTO::getGrade).average().getAsDouble());
+            }
+        }
+        return studentPerformanceDTO;
     }
 }

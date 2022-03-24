@@ -1,6 +1,8 @@
 package by.vstu.electronicjournal.controller;
 
+import by.vstu.electronicjournal.dto.AcademicPerformanceDTO;
 import by.vstu.electronicjournal.dto.JournalContentDTO;
+import by.vstu.electronicjournal.dto.StudentPerformanceDTO;
 import by.vstu.electronicjournal.service.JournalContentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +24,11 @@ public class JournalContentController {
     @PostMapping
     public JournalContentDTO create(@RequestBody JournalContentDTO contentDTO) {
         return journalContentService.create(contentDTO);
+    }
+
+    @GetMapping("getAcademicPerformance")
+    public StudentPerformanceDTO getStudentOverralGPAById(@RequestParam("q") String query) {
+        return journalContentService.getStudentOverralGPAById(query);
     }
 
     @GetMapping("{id}")

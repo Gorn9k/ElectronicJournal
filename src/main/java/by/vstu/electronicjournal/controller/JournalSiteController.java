@@ -1,6 +1,8 @@
 package by.vstu.electronicjournal.controller;
 
+import by.vstu.electronicjournal.dto.AcademicPerformanceDTO;
 import by.vstu.electronicjournal.dto.JournalSiteDTO;
+import by.vstu.electronicjournal.dto.StudentPerformanceDTO;
 import by.vstu.electronicjournal.service.JournalSiteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +31,21 @@ public class JournalSiteController {
         return journalSiteService.searchByTeacherAndDiscipline(query);
     }
 
+    @GetMapping("getAcademicPerformanceByGroupAndDicsipline")
+    public List<AcademicPerformanceDTO> getGeneralAcademicPerformance(@RequestParam("q") String query) {
+        return journalSiteService.getGeneralAcademicPerformance(query);
+    }
+
+    @GetMapping("getAcademicPerformanceByDisciplineAndStudent")
+    public StudentPerformanceDTO getGeneralStudentProgressInDiscipline(@RequestParam("q") String query) {
+        return journalSiteService.getGeneralStudentProgressInDiscipline(query);
+    }
+
+    @GetMapping("getAcademicPerformanceMissedPassesByDisciplineAndStudent")
+    public AcademicPerformanceDTO getNumberMissedClassesByStudent(@RequestParam("q") String query) {
+        return journalSiteService.getNumberMissedClassesByStudent(query);
+    }
+
     @PostMapping
     public JournalSiteDTO create(@RequestBody JournalSiteDTO dto) {
         return journalSiteService.create(dto);
@@ -40,10 +57,10 @@ public class JournalSiteController {
     }
 
     @GetMapping("filter")
-    public JournalSiteDTO getFilteredByTeacherAndGroupAndDisciplineAndTypeClassAndSubGroup(@RequestParam("teacher_id") Long teacherId,
+    public JournalSiteDTO getFilteredByTeacherAndGroupAndDisciplineAndTypeClassAndSubGroup(@RequestParam("teacher_idFromSource") Long teacherIdFromSource,
                @RequestParam("group_name") String groupName, @RequestParam("discipline_id") Long disciplineId, @RequestParam("type_class_id") Long typeClassId,
                @RequestParam("sub_group_number") Integer subGroupNumber) {
-        return journalSiteService.getFilteredByTeacherAndGroupAndDisciplineTypeClassAndSubGroup(teacherId, groupName, disciplineId, typeClassId, subGroupNumber);
+        return journalSiteService.getFilteredByTeacherAndGroupAndDisciplineTypeClassAndSubGroup(teacherIdFromSource, groupName, disciplineId, typeClassId, subGroupNumber);
     }
 
     @PatchMapping("{id}")
