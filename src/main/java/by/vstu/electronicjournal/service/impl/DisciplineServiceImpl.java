@@ -60,6 +60,7 @@ public class DisciplineServiceImpl
     public List<DisciplineDTO> getDisciplinesByGroup(String query) {
         HashSet<Long> set = new HashSet<>();
         journalSiteService.search(query).forEach(journalSiteDTO -> set.add(journalSiteDTO.getDiscipline().getId()));
+
         List<DisciplineDTO> disciplineDTOs = new ArrayList<>();
         set.stream().forEach(s -> {
             DisciplineDTO disciplineDTO = mapper.toDTO(disciplineRepository.getById(s), DisciplineDTO.class);
