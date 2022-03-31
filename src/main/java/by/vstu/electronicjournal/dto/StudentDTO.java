@@ -11,6 +11,5 @@ public class StudentDTO extends AbstractDTO {
     private String surname;
     private String name;
     private String patronymic;
-    private Integer subGroupIdentificator;
 
 }

@@ -58,12 +58,12 @@ public class DisciplineServiceImpl
 
     @Override
     public List<DisciplineDTO> getDisciplinesByGroup(String query) {
-        HashSet<String> set = new HashSet<>();
-        journalSiteService.search(query).forEach(journalSiteDTO -> set.add(journalSiteDTO.getDiscipline().getName()));
+        HashSet<Long> set = new HashSet<>();
+        journalSiteService.search(query).forEach(journalSiteDTO -> set.add(journalSiteDTO.getDiscipline().getId()));
+
         List<DisciplineDTO> disciplineDTOs = new ArrayList<>();
         set.stream().forEach(s -> {
-            DisciplineDTO disciplineDTO = new DisciplineDTO();
-            disciplineDTO.setName(s);
+            DisciplineDTO disciplineDTO = mapper.toDTO(disciplineRepository.getById(s), DisciplineDTO.class);
             disciplineDTOs.add(disciplineDTO);
         });
         return disciplineDTOs;
