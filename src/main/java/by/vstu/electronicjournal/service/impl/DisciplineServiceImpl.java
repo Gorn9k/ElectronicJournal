@@ -1,10 +1,12 @@
 package by.vstu.electronicjournal.service.impl;
 
 import by.vstu.electronicjournal.dto.DisciplineDTO;
+import by.vstu.electronicjournal.dto.JournalSiteDTO;
 import by.vstu.electronicjournal.entity.Discipline;
 import by.vstu.electronicjournal.mapper.Mapper;
 import by.vstu.electronicjournal.repository.DisciplineRepository;
 import by.vstu.electronicjournal.service.DisciplineService;
+import by.vstu.electronicjournal.service.JournalSiteService;
 import by.vstu.electronicjournal.service.common.impl.CommonCRUDServiceImpl;
 import by.vstu.electronicjournal.service.utils.ActuatorFromGeneralResources;
 import by.vstu.electronicjournal.service.utils.factory.DisciplineFactory;
@@ -14,7 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class DisciplineServiceImpl
@@ -29,6 +31,9 @@ public class DisciplineServiceImpl
 
     @Autowired
     private DisciplineRepository disciplineRepository;
+
+    @Autowired
+    private JournalSiteService journalSiteService;
 
     private ActuatorFromGeneralResources<DisciplineDTO> relatedResources;
 
@@ -49,6 +54,19 @@ public class DisciplineServiceImpl
         }
 
         return mapper.toDTOs(disciplineRepository.findAll(getSpecifications(query)), DisciplineDTO.class);
+    }
+
+    @Override
+    public List<DisciplineDTO> getDisciplinesByGroup(String query) {
+        HashSet<String> set = new HashSet<>();
+        journalSiteService.search(query).forEach(journalSiteDTO -> set.add(journalSiteDTO.getGroup().getName()));
+        List<DisciplineDTO> disciplineDTOs = new ArrayList<>();
+        set.stream().forEach(s -> {
+            DisciplineDTO disciplineDTO = new DisciplineDTO();
+            disciplineDTO.setName(s);
+            disciplineDTOs.add(disciplineDTO);
+        });
+        return disciplineDTOs;
     }
 
     @Override

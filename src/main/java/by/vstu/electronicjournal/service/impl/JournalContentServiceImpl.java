@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class JournalContentServiceImpl
@@ -94,10 +95,11 @@ public class JournalContentServiceImpl
         StudentPerformanceDTO studentPerformanceDTO = new StudentPerformanceDTO();
         if (!journalContentDTOs.isEmpty()) {
             studentPerformanceDTO.setStudentDTO(journalContentDTOs.get(0).getStudent());
-            long count = journalContentDTOs.stream().filter(journalContentDTO ->
-                    journalContentDTO.getGrade() != null).count();
+            List<JournalContentDTO> journalContentDTOList = journalContentDTOs.stream().filter(journalContentDTO ->
+                    journalContentDTO.getGrade() != null).collect(Collectors.toList());
+            long count = journalContentDTOList.size();
             if (count != 0) {
-                studentPerformanceDTO.setOverallGPA(journalContentDTOs.stream().mapToInt(JournalContentDTO::getGrade).average().getAsDouble());
+                studentPerformanceDTO.setOverallGPA(journalContentDTOList.stream().mapToInt(JournalContentDTO::getGrade).average().getAsDouble());
             }
         }
         return studentPerformanceDTO;

@@ -18,4 +18,6 @@ public interface DisciplineService
      * @return list of changes
      */
     List<DisciplineDTO> search(String query);
+
+    List<DisciplineDTO> getDisciplinesByGroup(String query);
 }

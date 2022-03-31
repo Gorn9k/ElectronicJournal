@@ -1,6 +1,7 @@
 package by.vstu.electronicjournal.controller;
 
 import by.vstu.electronicjournal.dto.DisciplineDTO;
+import by.vstu.electronicjournal.dto.StudentDTO;
 import by.vstu.electronicjournal.service.DisciplineService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,5 +21,10 @@ public class DisciplineController {
     @GetMapping("search")
     public List<DisciplineDTO> search(@RequestParam("q") String query) {
         return disciplineService.search(query);
+    }
+
+    @GetMapping("searchByGroup")
+    public List<DisciplineDTO> getDisciplinesByGroup(@RequestParam("q") String query) {
+        return disciplineService.getDisciplinesByGroup(query);
     }
 }

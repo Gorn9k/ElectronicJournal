@@ -20,5 +20,5 @@ public interface StudentService
      */
     List<StudentDTO> search(String query);
 
-
+    List<StudentDTO> getStudentsByGroup(String query);
 }
