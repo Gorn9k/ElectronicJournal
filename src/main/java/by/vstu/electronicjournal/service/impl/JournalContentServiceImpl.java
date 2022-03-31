@@ -88,20 +88,4 @@ public class JournalContentServiceImpl
             journalContentRepository.save(journalContent);
         }
     }
-
-    @Override
-    public StudentPerformanceDTO getStudentOverralGPAById(String query) {
-        List<JournalContentDTO> journalContentDTOs = search(query);
-        StudentPerformanceDTO studentPerformanceDTO = new StudentPerformanceDTO();
-        if (!journalContentDTOs.isEmpty()) {
-            studentPerformanceDTO.setStudentDTO(journalContentDTOs.get(0).getStudent());
-            List<JournalContentDTO> journalContentDTOList = journalContentDTOs.stream().filter(journalContentDTO ->
-                    journalContentDTO.getGrade() != null).collect(Collectors.toList());
-            long count = journalContentDTOList.size();
-            if (count != 0) {
-                studentPerformanceDTO.setOverallGPA(journalContentDTOList.stream().mapToInt(JournalContentDTO::getGrade).average().getAsDouble());
-            }
-        }
-        return studentPerformanceDTO;
-    }
 }

@@ -26,11 +26,6 @@ public class JournalContentController {
         return journalContentService.create(contentDTO);
     }
 
-    @GetMapping("getAcademicPerformance")
-    public StudentPerformanceDTO getStudentOverralGPAById(@RequestParam("q") String query) {
-        return journalContentService.getStudentOverralGPAById(query);
-    }
-
     @GetMapping("{id}")
     public JournalContentDTO getById(@PathVariable("id") Long id) {
         return journalContentService.findOne(id);

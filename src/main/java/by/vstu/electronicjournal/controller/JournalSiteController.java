@@ -36,6 +36,11 @@ public class JournalSiteController {
         return journalSiteService.getGeneralAcademicPerformance(query);
     }
 
+    @GetMapping("getAcademicPerformanceStudentById")
+    public AcademicPerformanceDTO getStudentOverralGPAById(@RequestParam("q") String query) {
+        return journalSiteService.getStudentOverralGPAById(query);
+    }
+
     @GetMapping("getAcademicPerformanceByDisciplineAndStudent")
     public AcademicPerformanceDTO getGeneralStudentProgressInDiscipline(@RequestParam("q") String query) {
         return journalSiteService.getGeneralStudentProgressInDiscipline(query);
