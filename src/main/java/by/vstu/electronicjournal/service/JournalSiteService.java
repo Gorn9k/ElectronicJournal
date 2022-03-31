@@ -1,6 +1,7 @@
 package by.vstu.electronicjournal.service;
 
 import by.vstu.electronicjournal.dto.AcademicPerformanceDTO;
+import by.vstu.electronicjournal.dto.JournalContentDTO;
 import by.vstu.electronicjournal.dto.JournalSiteDTO;
 import by.vstu.electronicjournal.dto.StudentPerformanceDTO;
 import by.vstu.electronicjournal.entity.JournalSite;
@@ -8,6 +9,7 @@ import by.vstu.electronicjournal.service.common.CRUDService;
 import by.vstu.electronicjournal.service.common.RSQLSearch;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public interface JournalSiteService extends CRUDService<JournalSiteDTO>, RSQLSearch<JournalSite> {
 
@@ -37,5 +39,7 @@ public interface JournalSiteService extends CRUDService<JournalSiteDTO>, RSQLSea
     List<AcademicPerformanceDTO> getGeneralAcademicPerformance(String query);
 
     AcademicPerformanceDTO getGeneralStudentProgressInDiscipline(String query);
+
+    AcademicPerformanceDTO getStudentOverralGPAById(String query);
 
 }

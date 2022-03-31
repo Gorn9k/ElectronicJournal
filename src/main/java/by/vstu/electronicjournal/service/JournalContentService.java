@@ -31,6 +31,4 @@ public interface JournalContentService extends CRUDService<JournalContentDTO>, R
      * This method update records of headers for
      */
     void generate(JournalHeader header);
-
-    StudentPerformanceDTO getStudentOverralGPAById(String query);
 }

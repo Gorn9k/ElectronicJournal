@@ -6,11 +6,9 @@ import by.vstu.electronicjournal.entity.*;
 import by.vstu.electronicjournal.entity.common.Status;
 import by.vstu.electronicjournal.mapper.Mapper;
 import by.vstu.electronicjournal.repository.JournalSiteRepository;
-import by.vstu.electronicjournal.service.DisciplineService;
-import by.vstu.electronicjournal.service.GroupService;
-import by.vstu.electronicjournal.service.JournalSiteService;
-import by.vstu.electronicjournal.service.TeacherService;
+import by.vstu.electronicjournal.service.*;
 import by.vstu.electronicjournal.service.common.impl.CommonCRUDServiceImpl;
+import liquibase.pro.packaged.A;
 import liquibase.pro.packaged.S;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,6 +40,9 @@ public class JournalSiteServiceImpl
 
     @Autowired
     private DisciplineService disciplineService;
+
+    @Autowired
+    private JournalContentService journalContentService;
 
     @Autowired
     private TeacherService teacherService;
@@ -139,6 +140,16 @@ public class JournalSiteServiceImpl
             List<JournalContentDTO> journalContentDTOList = journalContentDTOs.stream().filter(journalContentDTO ->
                     journalContentDTO.getStudent().getId().equals(studentId)).collect(Collectors.toList());
             academicPerformanceDTO = getAcademicPerformanceDTOByJournalContentDTOList(journalContentDTOList);
+        }
+        return academicPerformanceDTO;
+    }
+
+    @Override
+    public AcademicPerformanceDTO getStudentOverralGPAById(String query) {
+        List<JournalContentDTO> journalContentDTOs = journalContentService.search(query);
+        AcademicPerformanceDTO academicPerformanceDTO = new AcademicPerformanceDTO();
+        if (!journalContentDTOs.isEmpty()) {
+            academicPerformanceDTO = getAcademicPerformanceDTOByJournalContentDTOList(journalContentDTOs);
         }
         return academicPerformanceDTO;
     }
