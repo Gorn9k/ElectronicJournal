@@ -36,8 +36,6 @@ public interface JournalSiteService extends CRUDService<JournalSiteDTO>, RSQLSea
 
     List<AcademicPerformanceDTO> getGeneralAcademicPerformance(String query);
 
-    StudentPerformanceDTO getGeneralStudentProgressInDiscipline(String query);
-
-    AcademicPerformanceDTO getNumberMissedClassesByStudent(String query);
+    AcademicPerformanceDTO getGeneralStudentProgressInDiscipline(String query);
 
 }

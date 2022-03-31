@@ -1,5 +1,6 @@
 package by.vstu.electronicjournal.controller;
 
+import by.vstu.electronicjournal.dto.JournalSiteDTO;
 import by.vstu.electronicjournal.dto.StudentDTO;
 import by.vstu.electronicjournal.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,5 +21,10 @@ public class StudentController {
     @GetMapping("search")
     public List<StudentDTO> search(@RequestParam("q") String query) {
         return studentService.search(query);
+    }
+
+    @GetMapping("searchByGroup")
+    public List<StudentDTO> getStudentsByGroup(@RequestParam("q") String query) {
+        return studentService.getStudentsByGroup(query);
     }
 }

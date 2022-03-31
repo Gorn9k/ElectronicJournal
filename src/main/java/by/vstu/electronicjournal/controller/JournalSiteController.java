@@ -37,13 +37,8 @@ public class JournalSiteController {
     }
 
     @GetMapping("getAcademicPerformanceByDisciplineAndStudent")
-    public StudentPerformanceDTO getGeneralStudentProgressInDiscipline(@RequestParam("q") String query) {
+    public AcademicPerformanceDTO getGeneralStudentProgressInDiscipline(@RequestParam("q") String query) {
         return journalSiteService.getGeneralStudentProgressInDiscipline(query);
-    }
-
-    @GetMapping("getAcademicPerformanceMissedPassesByDisciplineAndStudent")
-    public AcademicPerformanceDTO getNumberMissedClassesByStudent(@RequestParam("q") String query) {
-        return journalSiteService.getNumberMissedClassesByStudent(query);
     }
 
     @PostMapping
