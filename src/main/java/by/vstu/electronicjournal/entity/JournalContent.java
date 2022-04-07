@@ -9,6 +9,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Entity
@@ -17,6 +18,7 @@ import lombok.NoArgsConstructor;
 @AttributeOverride(name = "id", column = @Column(name = "journal_content_id"))
 public class JournalContent extends AbstractEntity {
 
+	@ToString.Exclude
 	@ManyToOne
 	@JoinColumn(name = "journal_header_id")
 	private JournalHeader journalHeader;

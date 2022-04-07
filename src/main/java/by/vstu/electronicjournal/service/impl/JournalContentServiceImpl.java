@@ -66,26 +66,28 @@ public class JournalContentServiceImpl
 
     @Override
     public void generate(JournalHeader header) {
-        String query = String.format("group.name==%s;subGroupIdentificator=", header.getJournalSite().getGroup().getName());
+        if (header.getJournalContents() == null || header.getJournalContents().size() == 0) {
+            String query = String.format("group.name==%s;subGroupIdentificator=", header.getJournalSite().getGroup().getName());
 
-        if (header.getSubGroup() == 0) {
-            query += "in=(1,2)";
-        } else {
-            query += "=" + header.getSubGroup();
-        }
+            if (header.getSubGroup() == 0) {
+                query += "in=(1,2)";
+            } else {
+                query += "=" + header.getSubGroup();
+            }
 
-        List<StudentDTO> studentDTOS = (List<StudentDTO>) studentService.validator(query);
+            List<StudentDTO> studentDTOS = (List<StudentDTO>) studentService.validator(query);
 
-        for (StudentDTO studentDTO : studentDTOS) {
+            for (StudentDTO studentDTO : studentDTOS) {
 
-            JournalContent journalContent = new JournalContent();
-            Student student = (Student) mapper.toEntity(studentDTO, Student.class);
-           // student.setGroup(header.getJournalSite().getGroup());
-            journalContent.setStatus(Status.ACTIVE);
-            journalContent.setJournalHeader(header);
-            journalContent.setStudent(student);
+                JournalContent journalContent = new JournalContent();
+                Student student = (Student) mapper.toEntity(studentDTO, Student.class);
+                // student.setGroup(header.getJournalSite().getGroup());
+                journalContent.setStatus(Status.ACTIVE);
+                journalContent.setJournalHeader(header);
+                journalContent.setStudent(student);
 
-            journalContentRepository.save(journalContent);
+                journalContentRepository.save(journalContent);
+            }
         }
     }
 }

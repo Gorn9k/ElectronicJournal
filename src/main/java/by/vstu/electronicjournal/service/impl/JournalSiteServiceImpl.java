@@ -63,7 +63,7 @@ public class JournalSiteServiceImpl
     }
 
     @Override
-    public List<JournalSiteDTO> searchByTeacherAndDiscipline(String query){
+    public List<JournalSiteDTO> searchByTeacherAndDiscipline(String query) {
         Map<String, JournalSiteDTO> map = new HashMap<>();
         search(query).forEach(journalSiteDTO -> map.put(journalSiteDTO.getGroup().getName(), journalSiteDTO));
         List<JournalSiteDTO> journalSiteDTOS = new ArrayList<>();
@@ -96,7 +96,7 @@ public class JournalSiteServiceImpl
 
     private AcademicPerformanceDTO getAcademicPerformanceDTOByJournalContentDTOList(List<JournalContentDTO> journalContentDTOList) {
         AcademicPerformanceDTO academicPerformanceDTO = new AcademicPerformanceDTO();
-        if (journalContentDTOList.size()!=0) {
+        if (journalContentDTOList.size() != 0) {
             StudentPerformanceDTO studentPerformanceDTO = new StudentPerformanceDTO();
             studentPerformanceDTO.setStudentDTO(journalContentDTOList.get(0).getStudent());
             List<JournalContentDTO> journalContentDTOListFilteredByGrade = journalContentDTOList.stream().filter(journalContentDTO ->
@@ -167,7 +167,6 @@ public class JournalSiteServiceImpl
         List<JournalSite> result = new ArrayList<>();
 
         for (PatternDTO patternDTO : patternDTOS) {
-
             DisciplineDTO disciplineDTO = disciplineService.validator("name==\'" + patternDTO.getDisciplineName() + "\'").get(0);
             TeacherDTO teacherDTO = teacherService.validator(parsingFIOTeacher(patternDTO.getTeacherFio())).get(0);
             GroupDTO groupDTO = groupService.validator("name==\'" + patternDTO.getGroupName() + "\'").get(0);
@@ -184,10 +183,10 @@ public class JournalSiteServiceImpl
     }
 
     @Override
-    public JournalSiteDTO getFilteredByTeacherAndGroupAndDisciplineTypeClassAndSubGroup(Long teacherIdFromSource, String groupName, Long disciplineId, Long typeClassId, Integer subGroupNumber){
+    public JournalSiteDTO getFilteredByTeacherAndGroupAndDisciplineTypeClassAndSubGroup(Long teacherIdFromSource, String groupName, Long disciplineId, Long typeClassId, Integer subGroupNumber) {
         JournalSite journalSite = journalSiteRepository.findByTeacherIdFromSourceAndGroupNameAndDisciplineId(teacherIdFromSource, groupName, disciplineId).get(0);
         journalSite.setJournalHeaders(journalSite.getJournalHeaders().stream().filter(journalHeader -> journalHeader.getTypeClass().getId().equals(typeClassId) &&
-                journalHeader.getSubGroup().equals(subGroupNumber) && journalHeader.getDateOfLesson()!=null).collect(Collectors.toList()));
+                journalHeader.getSubGroup().equals(subGroupNumber) && journalHeader.getDateOfLesson() != null).collect(Collectors.toList()));
         return (JournalSiteDTO) mapper.toDTO(journalSite, JournalSiteDTO.class);
     }
 
