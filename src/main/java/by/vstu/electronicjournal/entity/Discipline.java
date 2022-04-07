@@ -3,6 +3,7 @@ package by.vstu.electronicjournal.entity;
 import by.vstu.electronicjournal.entity.common.AbstractEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ public class Discipline extends AbstractEntity {
 
     //private Group group;
 
+    @ToString.Exclude
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "discipline")
     private List<JournalSite> journalSites = new ArrayList<>();
 

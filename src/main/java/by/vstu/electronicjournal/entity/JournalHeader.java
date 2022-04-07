@@ -14,6 +14,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Entity
@@ -22,10 +23,12 @@ import lombok.NoArgsConstructor;
 @AttributeOverride(name = "id", column = @Column(name = "journal_header_id"))
 public class JournalHeader extends AbstractEntity {
 
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REFRESH})
+    @ToString.Exclude
+    @ManyToOne(cascade = {CascadeType.REFRESH})
     @JoinColumn(name = "type_class_id")
     private TypeClass typeClass;
 
+    @ToString.Exclude
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "journal_site_id")
     private JournalSite journalSite;
@@ -49,6 +52,7 @@ public class JournalHeader extends AbstractEntity {
     @Column(name = "hours_count")
     private Integer hoursCount;
 
+    @ToString.Exclude
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, mappedBy = "journalHeader")
     private List<JournalContent> journalContents = new ArrayList<>();
 }

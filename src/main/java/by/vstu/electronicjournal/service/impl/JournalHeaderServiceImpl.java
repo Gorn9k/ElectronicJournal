@@ -13,6 +13,7 @@ import by.vstu.electronicjournal.repository.JournalHeaderRepository;
 import by.vstu.electronicjournal.repository.JournalSiteRepository;
 import by.vstu.electronicjournal.service.JournalContentService;
 import by.vstu.electronicjournal.service.JournalHeaderService;
+import by.vstu.electronicjournal.service.JournalSiteService;
 import by.vstu.electronicjournal.service.TypeClassService;
 import by.vstu.electronicjournal.service.common.impl.CommonCRUDServiceImpl;
 
@@ -33,141 +34,163 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class JournalHeaderServiceImpl
-		extends CommonCRUDServiceImpl<JournalHeader, JournalHeaderDTO, JournalHeaderRepository>
-		implements JournalHeaderService {
+        extends CommonCRUDServiceImpl<JournalHeader, JournalHeaderDTO, JournalHeaderRepository>
+        implements JournalHeaderService {
 
-	@Value("${entrance.timetable}")
-	private String path;
+    @Value("${entrance.timetable}")
+    private String path;
 
-	@Autowired
-	private Mapper mapper;
+    @Autowired
+    private Mapper mapper;
 
-	@Autowired
-	private JournalSiteRepository journalSiteRepository;
+    @Autowired
+    private JournalSiteRepository journalSiteRepository;
 
-	@Autowired
-	private JournalHeaderRepository journalHeaderRepository;
+    @Autowired
+    private JournalHeaderRepository journalHeaderRepository;
 
-	@Autowired
-	private JournalContentRepository journalContentRepository;
+    @Autowired
+    private JournalContentRepository journalContentRepository;
 
-	@Autowired
-	private JournalContentService journalContentService;
+    @Autowired
+    private JournalContentService journalContentService;
 
-	@Autowired
-	private TypeClassService typeClassService;
+    @Autowired
+    private JournalSiteService journalSiteService;
 
-	public JournalHeaderServiceImpl() {
-		super(JournalHeader.class, JournalHeaderDTO.class);
-	}
+    @Autowired
+    private TypeClassService typeClassService;
 
-	@Override
-	public List<JournalHeaderDTO> search(String query) {
-		if (query.isEmpty()) {
-			return findAll();
-		}
-		return mapper.toDTOs(journalHeaderRepository.findAll(getSpecifications(query)),
-				JournalHeaderDTO.class);
-	}
+    public JournalHeaderServiceImpl() {
+        super(JournalHeader.class, JournalHeaderDTO.class);
+    }
 
-	@Override
-	public JournalHeaderDTO create(ParamsForCreateJournalHeader params) {
+    @Override
+    public List<JournalHeaderDTO> search(String query) {
+        if (query.isEmpty()) {
+            return findAll();
+        }
+        return mapper.toDTOs(journalHeaderRepository.findAll(getSpecifications(query)),
+                JournalHeaderDTO.class);
+    }
 
-		JournalSite journalSite = journalSiteRepository.getById(params.getJournalSiteId());
-		JournalHeader journalHeader = (JournalHeader) mapper
-				.toEntity(params.getJournalHeaderDTO(), JournalHeader.class);
-		journalHeader.setJournalSite(journalSite);
-		journalHeader = journalHeaderRepository.save(journalHeader);
+    @Override
+    public JournalHeaderDTO create(ParamsForCreateJournalHeader params) {
 
-		journalContentService.generate(journalHeader);
+        JournalSite journalSite = journalSiteRepository.getById(params.getJournalSiteId());
+        JournalHeader journalHeader = (JournalHeader) mapper
+                .toEntity(params.getJournalHeaderDTO(), JournalHeader.class);
+        journalHeader.setJournalSite(journalSite);
+        journalHeader = journalHeaderRepository.save(journalHeader);
 
-		return (JournalHeaderDTO) mapper.toDTO(journalHeader, JournalHeaderDTO.class);
-	}
+        journalContentService.generate(journalHeader);
 
-	@Override
-	public List<JournalSite> generate(List<JournalSite> params) {
+        return (JournalHeaderDTO) mapper.toDTO(journalHeader, JournalHeaderDTO.class);
+    }
 
-		RestTemplate restTemplate = new RestTemplate();
+    @Override
+    public List<JournalSite> generate(List<JournalSite> params) {
 
-		for (JournalSite journalSite : params) {
+        RestTemplate restTemplate = new RestTemplate();
 
-			String queryToCommonInfo = String.format(
-					"%s/patterns/search?q=groupName==%s;disciplineName==\'%s\';teacherFio==%s*",
-					path,
-					journalSite.getGroup().getName(),
-					journalSite.getDiscipline().getName(),
-					journalSite.getTeacher().getSurname()
-			);
-			List<PatternDTO> patternDTOS =
-					restTemplate.exchange(queryToCommonInfo, HttpMethod.GET, null,
-							new ParameterizedTypeReference<List<PatternDTO>>() {
-							}).getBody();
+        for (JournalSite journalSite : params) {
 
-			List<JournalHeaderDTO> headerDTOS = new ArrayList<>();
+            String queryToCommonInfo = String.format(
+                    "%s/patterns/search?q=groupName==%s;disciplineName==\'%s\';teacherFio==%s*",
+                    path,
+                    journalSite.getGroup().getName(),
+                    journalSite.getDiscipline().getName(),
+                    journalSite.getTeacher().getSurname()
+            );
+            List<PatternDTO> patternDTOS =
+                    restTemplate.exchange(queryToCommonInfo, HttpMethod.GET, null,
+                            new ParameterizedTypeReference<List<PatternDTO>>() {
+                            }).getBody();
 
-			for (PatternDTO patternDTO : patternDTOS) {
-				JournalHeaderDTO journalHeaderDTO = new JournalHeaderDTO();
-				journalHeaderDTO.setSubGroup(patternDTO.getSubGroup());
-				journalHeaderDTO.setHoursCount(patternDTO.getLessonNumber());
-				journalHeaderDTO.setStatus(Status.ACTIVE);
-				TypeClassDTO typeClassDTO = typeClassService
-						.validator("name==\'" + patternDTO.getTypeClassName() + "\'").get(0);
-				journalHeaderDTO.setTypeClass(typeClassDTO);
+            List<JournalSiteDTO> journalSites = journalSiteService.search(String.
+                    format("group.id==%s;discipline.id==%s;teacher.id==%s",
+                            journalSite.getGroup().getId(), journalSite.getDiscipline().getId(), journalSite.getTeacher().getId()));
 
-				headerDTOS.add(journalHeaderDTO);
-			}
+            //patternDTOS = patternDTOS.stream().filter(patternDTO -> j)
 
-			List<JournalHeader> journalHeaders = mapper.toEntities(headerDTOS, JournalHeader.class);
-			journalHeaders.stream()
-					.forEach(journalHeader -> journalHeader.setJournalSite(journalSite));
-			journalSite.setJournalHeaders(journalHeaderRepository.saveAll(journalHeaders));
-		}
-		return params;
-	}
+            List<JournalHeaderDTO> journalHeaderDTOList = new ArrayList<>();
 
-	@Override
-	public List<JournalContentDTO> editList(Long id, List<JournalContentDTO> dtos) {
+            if (!journalSites.stream().anyMatch(journalSiteDTO -> journalSiteDTO.getJournalHeaders()!=null && !journalSiteDTO.getJournalHeaders().isEmpty())) {
+                journalSites.stream().forEach(journalSiteDTO -> journalHeaderDTOList.addAll(journalSiteDTO.getJournalHeaders()));
+            }
 
-		JournalHeader header = journalHeaderRepository.getById(id);
-		List<JournalContent> contents = mapper.toEntities(dtos, JournalContent.class);
+            List<JournalHeaderDTO> headerDTOS = new ArrayList<>();
 
-		for (JournalContent content : contents) {
-			content.setJournalHeader(header);
-		}
-		return mapper
-				.toDTOs(journalContentRepository.saveAllAndFlush(contents), JournalContentDTO.class);
-	}
+            for (PatternDTO patternDTO : patternDTOS) {
+                if (!journalSites.stream().anyMatch(journalSiteDTO -> journalSiteDTO.getJournalHeaders()!=null &&
+                        !journalSiteDTO.getJournalHeaders().isEmpty()) || !journalHeaderDTOList.isEmpty() &&
+                        journalHeaderDTOList.stream().allMatch(journalHeaderDTO ->
+                                !(journalHeaderDTO.getHoursCount().equals(patternDTO.getLessonNumber()) &&
+                                        journalHeaderDTO.getTypeClass().getName().equals(patternDTO.getTypeClassName()) &&
+                                        journalHeaderDTO.getSubGroup().equals(patternDTO.getSubGroup())))) {
+                    JournalHeaderDTO journalHeaderDTO = new JournalHeaderDTO();
+                    journalHeaderDTO.setSubGroup(patternDTO.getSubGroup());
+                    journalHeaderDTO.setHoursCount(patternDTO.getLessonNumber());
+                    journalHeaderDTO.setStatus(Status.ACTIVE);
+                    TypeClassDTO typeClassDTO = typeClassService
+                            .validator("name==\'" + patternDTO.getTypeClassName() + "\'").get(0);
+                    journalHeaderDTO.setTypeClass(typeClassDTO);
 
-	@Override
-	public AcademicPerformanceDTO getTotalNumberMissedClassesByStudentForPeriod(String query) {
-		Long studentId = Long.parseLong(query.split("==")[1].split(";")[0]);
-		LocalDate after = null, before = null;
-		int year = 0, month = 0, dayOfMonth;
-		try {
-			year = Integer.parseInt(query.split("==")[2].split("and")[0].split("-")[0]);
-			month = Integer.parseInt(query.split("==")[2].split("and")[0].split("-")[1]);
-			dayOfMonth = Integer.parseInt(query.split("==")[2].split("and")[0].split("-")[2]);
-			after = LocalDate.of(year,month,dayOfMonth);
-			year = Integer.parseInt(query.split("==")[2].split("and")[1].split("-")[0]);
-			month = Integer.parseInt(query.split("==")[2].split("and")[1].split("-")[1]);
-			dayOfMonth = Integer.parseInt(query.split("==")[2].split("and")[1].split("-")[2]);
-			before = LocalDate.of(year,month,dayOfMonth);
-		} catch (Exception e) {
-			System.out.println("Incorrect format date!");
-		}
-		query = String.format("dateOfLesson>=%s and dateOfLesson<=%s", after, before);
-		List<JournalHeaderDTO> journalHeaderDTOs = search(query);
-		List<JournalContentDTO> journalContentDTOs = new ArrayList<>();
-		AcademicPerformanceDTO academicPerformanceDTO = new AcademicPerformanceDTO();
-		StudentPerformanceDTO studentPerformanceDTO = new StudentPerformanceDTO();
-		journalHeaderDTOs.forEach(journalHeaderDTO -> journalContentDTOs.addAll(journalHeaderDTO.getJournalContents()));
-		List<JournalContentDTO> journalContentDTOList = journalContentDTOs.stream().filter(journalContentDTO -> journalContentDTO.getStudent().getId().equals(studentId)).collect(Collectors.toList());
-		if (journalContentDTOList.size()!=0) {
-			studentPerformanceDTO.setStudentDTO(journalContentDTOList.get(0).getStudent());
-			academicPerformanceDTO.setTotalNumberPasses(journalContentDTOList.stream().filter(journalContentDTO ->
-					journalContentDTO.getPresence()!=null && journalContentDTO.getPresence().equals(false)).count());
-		}
-		academicPerformanceDTO.setStudentPerformanceDTO(studentPerformanceDTO);
-		return academicPerformanceDTO;
-	}
+                    headerDTOS.add(journalHeaderDTO);
+                }
+            }
+
+            List<JournalHeader> journalHeaders = mapper.toEntities(headerDTOS, JournalHeader.class);
+            journalHeaders.stream()
+                    .forEach(journalHeader -> journalHeader.setJournalSite(journalSite));
+            journalSite.setJournalHeaders(journalHeaderRepository.saveAll(journalHeaders));
+        }
+        return params;
+    }
+
+    @Override
+    public List<JournalContentDTO> editList(Long id, List<JournalContentDTO> dtos) {
+
+        JournalHeader header = journalHeaderRepository.getById(id);
+        List<JournalContent> contents = mapper.toEntities(dtos, JournalContent.class);
+
+        for (JournalContent content : contents) {
+            content.setJournalHeader(header);
+        }
+        return mapper
+                .toDTOs(journalContentRepository.saveAllAndFlush(contents), JournalContentDTO.class);
+    }
+
+    @Override
+    public AcademicPerformanceDTO getTotalNumberMissedClassesByStudentForPeriod(String query) {
+        Long studentId = Long.parseLong(query.split("==")[1].split(";")[0]);
+        LocalDate after = null, before = null;
+        int year = 0, month = 0, dayOfMonth;
+        try {
+            year = Integer.parseInt(query.split("==")[2].split("and")[0].split("-")[0]);
+            month = Integer.parseInt(query.split("==")[2].split("and")[0].split("-")[1]);
+            dayOfMonth = Integer.parseInt(query.split("==")[2].split("and")[0].split("-")[2]);
+            after = LocalDate.of(year,month,dayOfMonth);
+            year = Integer.parseInt(query.split("==")[2].split("and")[1].split("-")[0]);
+            month = Integer.parseInt(query.split("==")[2].split("and")[1].split("-")[1]);
+            dayOfMonth = Integer.parseInt(query.split("==")[2].split("and")[1].split("-")[2]);
+            before = LocalDate.of(year,month,dayOfMonth);
+        } catch (Exception e) {
+            System.out.println("Incorrect format date!");
+        }
+        query = String.format("dateOfLesson>=%s and dateOfLesson<=%s", after, before);
+        List<JournalHeaderDTO> journalHeaderDTOs = search(query);
+        List<JournalContentDTO> journalContentDTOs = new ArrayList<>();
+        AcademicPerformanceDTO academicPerformanceDTO = new AcademicPerformanceDTO();
+        StudentPerformanceDTO studentPerformanceDTO = new StudentPerformanceDTO();
+        journalHeaderDTOs.forEach(journalHeaderDTO -> journalContentDTOs.addAll(journalHeaderDTO.getJournalContents()));
+        List<JournalContentDTO> journalContentDTOList = journalContentDTOs.stream().filter(journalContentDTO -> journalContentDTO.getStudent().getId().equals(studentId)).collect(Collectors.toList());
+        if (journalContentDTOList.size()!=0) {
+            studentPerformanceDTO.setStudentDTO(journalContentDTOList.get(0).getStudent());
+            academicPerformanceDTO.setTotalNumberPasses(journalContentDTOList.stream().filter(journalContentDTO ->
+                    journalContentDTO.getPresence()!=null && journalContentDTO.getPresence().equals(false)).count());
+        }
+        academicPerformanceDTO.setStudentPerformanceDTO(studentPerformanceDTO);
+        return academicPerformanceDTO;
+    }
 }

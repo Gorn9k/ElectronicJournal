@@ -11,6 +11,8 @@ import by.vstu.electronicjournal.service.JournalHeaderService;
 import by.vstu.electronicjournal.service.JournalSiteService;
 import by.vstu.electronicjournal.service.TypeClassService;
 import by.vstu.electronicjournal.service.utils.UtilService;
+
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.LinkedList;
 import java.util.List;
@@ -54,61 +56,83 @@ public class UtilServiceImpl implements UtilService {
 	@Override
 	public void generateJournalHeadersEveryDay() {
 
+		int year = 0, month = 0, dayOfMonth;
+		LocalDate after, before;
+		String query = "2022-03-21and2022-04-08";
+		year = Integer.parseInt(query.split("-")[0]);
+		month = Integer.parseInt(query.split("-")[1]);
+		dayOfMonth = Integer.parseInt(query.split("-")[2].split("and")[0]);
+		after = LocalDate.of(year, month, dayOfMonth);
+		year = Integer.parseInt(query.split("-")[2].split("and")[1]);
+		month = Integer.parseInt(query.split("-")[3]);
+		dayOfMonth = Integer.parseInt(query.split("-")[4]);
+		before = LocalDate.of(year, month, dayOfMonth).plusDays(1);
+
 		System.out.println(LocalTime.now());
+		for (LocalDate date = after; date.isBefore(before); date = date.plusDays(1)) {
+			for (ContentDTO dto : getContentFromTimetable(date)) {
 
-		for (ContentDTO dto : getContentFromTimetable()) {
+				List<JournalSiteDTO> siteDTOS = journalSiteService.search(
+						String.format(
+								"discipline.name==\'%s\';teacher.surname==%s;teacher.name==%s*;teacher.patronymic==%s*;group.name==\'%s\'",
+								dto.getDisciplineName(),
+								dto.getTeacherFio().split(" ")[0],
+								dto.getTeacherFio().split(" ")[1],
+								dto.getTeacherFio().split(" ")[2],
+								dto.getGroupName()
+						)
+				);
+				for (JournalSiteDTO journalSiteDTO : siteDTOS) {
 
-			List<JournalSiteDTO> siteDTOS = journalSiteService.search(
-					String.format(
-							"discipline.name==\'%s\';teacher.surname==%s;teacher.name==%s*;teacher.patronymic==%s*;group.name==\'%s\'",
-							dto.getDisciplineName(),
-							dto.getTeacherFio().split(" ")[0],
-							dto.getTeacherFio().split(" ")[1],
-							dto.getTeacherFio().split(" ")[2],
-							dto.getGroupName()
-					)
-			);
-			for (JournalSiteDTO journalSiteDTO : siteDTOS) {
+					JournalHeaderDTO journalHeaderDTOWithoutDate = null;
 
-				boolean flag = false;
+					boolean flag = false;
 
-				for (JournalHeaderDTO journalHeaderDTO : journalSiteDTO.getJournalHeaders()) {
-					try {
-						if (journalHeaderDTO.getDateOfLesson().isEqual(now())) {
-							flag = true;
+					for (JournalHeaderDTO journalHeaderDTO : journalSiteDTO.getJournalHeaders()) {
+						try {
+							if (journalHeaderDTO.getDateOfLesson() != null ||
+									!journalHeaderDTO.getTypeClass().getName().equals(dto.getTypeClassName())) {
+								if (journalHeaderDTO.getDateOfLesson().isEqual(date)) {
+									flag = true;
+								}
+							} else {
+								journalHeaderDTOWithoutDate = new JournalHeaderDTO();
+							}
+
+						} catch (NullPointerException e) {
+							continue;
 						}
-					} catch (NullPointerException e) {
+
+					}
+
+					if (flag) {
 						continue;
 					}
 
+					if (journalHeaderDTOWithoutDate != null) {
+						ParamsForCreateJournalHeader params = new ParamsForCreateJournalHeader();
+						journalHeaderDTOWithoutDate.setHoursCount(dto.getLessonNumber());
+						journalHeaderDTOWithoutDate.setSubGroup(dto.getSubGroup());
+						journalHeaderDTOWithoutDate.setDateOfLesson(dto.getLessonDate());
+						journalHeaderDTOWithoutDate.setTypeClass(
+								typeClassService.validator("name==\'" + dto.getTypeClassName() + "\'").get(0));
+
+						params.setJournalSiteId(journalSiteDTO.getId());
+						params.setJournalHeaderDTO(journalHeaderDTOWithoutDate);
+
+						journalHeaderService.create(params);
+					}
 				}
-
-				if (flag) {
-					continue;
-				}
-
-				ParamsForCreateJournalHeader params = new ParamsForCreateJournalHeader();
-				JournalHeaderDTO journalHeaderDTO = new JournalHeaderDTO();
-				journalHeaderDTO.setHoursCount(dto.getLessonNumber());
-				journalHeaderDTO.setSubGroup(dto.getSubGroup());
-				journalHeaderDTO.setDateOfLesson(dto.getLessonDate());
-				journalHeaderDTO.setTypeClass(
-						typeClassService.validator("name==\'" + dto.getTypeClassName() + "\'").get(0));
-
-				params.setJournalSiteId(journalSiteDTO.getId());
-				params.setJournalHeaderDTO(journalHeaderDTO);
-
-				journalHeaderService.create(params);
 			}
 		}
 	}
 
-	private LinkedList<ContentDTO> getContentFromTimetable() {
+	private LinkedList<ContentDTO> getContentFromTimetable(LocalDate date) {
 		RestTemplate restTemplate = new RestTemplate();
 
 		String query = String.format("%s/content/search?q=lessonDate==%s",
 				path,
-				now()
+				date
 		);
 		LinkedList<ContentDTO> contentDTOS =
 				restTemplate.exchange(query, HttpMethod.GET, null,
@@ -131,7 +155,7 @@ public class UtilServiceImpl implements UtilService {
 
 		query = String.format("%s/content/search?q=changes.postponed==%s",
 				path,
-				now()
+				date
 		);
 
 		LinkedList<ContentDTO> postponedContentDTO =
