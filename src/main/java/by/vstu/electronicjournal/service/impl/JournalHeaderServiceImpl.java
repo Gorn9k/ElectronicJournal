@@ -112,7 +112,7 @@ public class JournalHeaderServiceImpl
             for (PatternDTO patternDTO : patternDTOS) {
                 JournalHeaderDTO journalHeaderDTO = new JournalHeaderDTO();
                 journalHeaderDTO.setSubGroup(patternDTO.getSubGroup());
-
+                journalHeaderDTO.setHoursCount(patternDTO.getLessonNumber());
                 TypeClassDTO typeClassDTO = typeClassService
                         .validator("name==\'" + patternDTO.getTypeClassName() + "\'").get(0);
                 journalHeaderDTO.setTypeClass(typeClassDTO);
