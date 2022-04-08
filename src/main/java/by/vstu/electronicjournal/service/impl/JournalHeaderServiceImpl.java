@@ -107,37 +107,17 @@ public class JournalHeaderServiceImpl
                             new ParameterizedTypeReference<List<PatternDTO>>() {
                             }).getBody();
 
-            List<JournalSiteDTO> journalSites = journalSiteService.search(String.
-                    format("group.id==%s;discipline.id==%s;teacher.id==%s",
-                            journalSite.getGroup().getId(), journalSite.getDiscipline().getId(), journalSite.getTeacher().getId()));
-
-            //patternDTOS = patternDTOS.stream().filter(patternDTO -> j)
-
-            List<JournalHeaderDTO> journalHeaderDTOList = new ArrayList<>();
-
-            if (!journalSites.stream().anyMatch(journalSiteDTO -> journalSiteDTO.getJournalHeaders()!=null && !journalSiteDTO.getJournalHeaders().isEmpty())) {
-                journalSites.stream().forEach(journalSiteDTO -> journalHeaderDTOList.addAll(journalSiteDTO.getJournalHeaders()));
-            }
-
             List<JournalHeaderDTO> headerDTOS = new ArrayList<>();
 
             for (PatternDTO patternDTO : patternDTOS) {
-                if (!journalSites.stream().anyMatch(journalSiteDTO -> journalSiteDTO.getJournalHeaders()!=null &&
-                        !journalSiteDTO.getJournalHeaders().isEmpty()) || !journalHeaderDTOList.isEmpty() &&
-                        journalHeaderDTOList.stream().allMatch(journalHeaderDTO ->
-                                !(journalHeaderDTO.getHoursCount().equals(patternDTO.getLessonNumber()) &&
-                                        journalHeaderDTO.getTypeClass().getName().equals(patternDTO.getTypeClassName()) &&
-                                        journalHeaderDTO.getSubGroup().equals(patternDTO.getSubGroup())))) {
-                    JournalHeaderDTO journalHeaderDTO = new JournalHeaderDTO();
-                    journalHeaderDTO.setSubGroup(patternDTO.getSubGroup());
-                    journalHeaderDTO.setHoursCount(patternDTO.getLessonNumber());
-                    journalHeaderDTO.setStatus(Status.ACTIVE);
-                    TypeClassDTO typeClassDTO = typeClassService
-                            .validator("name==\'" + patternDTO.getTypeClassName() + "\'").get(0);
-                    journalHeaderDTO.setTypeClass(typeClassDTO);
+                JournalHeaderDTO journalHeaderDTO = new JournalHeaderDTO();
+                journalHeaderDTO.setSubGroup(patternDTO.getSubGroup());
 
-                    headerDTOS.add(journalHeaderDTO);
-                }
+                TypeClassDTO typeClassDTO = typeClassService
+                        .validator("name==\'" + patternDTO.getTypeClassName() + "\'").get(0);
+                journalHeaderDTO.setTypeClass(typeClassDTO);
+
+                headerDTOS.add(journalHeaderDTO);
             }
 
             List<JournalHeader> journalHeaders = mapper.toEntities(headerDTOS, JournalHeader.class);

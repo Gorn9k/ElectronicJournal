@@ -71,11 +71,18 @@ public class excel1 {
                 journalSiteDTO1.setDiscipline(journalSiteDTO.getDiscipline());
                 journalSiteDTO1.setTeacher(journalSiteDTO.getTeacher());
                 journalHeaders = new ArrayList<>(journalSiteDTO.getJournalHeaders());
-                journalHeaders = journalHeaders.stream().filter(journalHeaderDTO -> journalHeaderDTO.getDateOfLesson() != null &&
-                        journalHeaderDTO.getDateOfLesson().equals(finalDate)).collect(Collectors.toList());
+                journalHeaders = journalHeaders.stream().filter(journalHeaderDTO -> {
+                    if (journalHeaderDTO.getDateOfLesson() != null &&
+                            journalHeaderDTO.getDateOfLesson().equals(finalDate)) {
+                    }
+                    return journalHeaderDTO.getDateOfLesson() != null &&
+                        journalHeaderDTO.getDateOfLesson().equals(finalDate);
+                }).collect(Collectors.toList());
                 journalSiteDTO1.setJournalHeaders(journalHeaders);
                 if (journalSiteDTO1.getJournalHeaders().size() != 0) {
-                    finalJournalSiteDTOList.add(journalSiteDTO1);
+
+                        finalJournalSiteDTOList.add(journalSiteDTO1);
+
                 }
             });
             dates.add(date);
@@ -91,9 +98,5 @@ public class excel1 {
         excel1.setMap(map);
         excel1.setDates(dates);
         return excel1;
-    }
-
-    public void getElement(Map<LocalDate, List<JournalSiteDTO>> map) {
-
     }
 }
