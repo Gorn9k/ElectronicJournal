@@ -30,14 +30,15 @@ import java.util.stream.Collectors;
 public class ElectronicJournalApplication {
 
     public static void main(String[] args) throws IOException {
-        ConfigurableApplicationContext cat = SpringApplication.run(ElectronicJournalApplication.class, args);
+        SpringApplication.run(ElectronicJournalApplication.class, args);
+        //ConfigurableApplicationContext cat = SpringApplication.run(ElectronicJournalApplication.class, args);
         //FileInputStream fileInputStream = new FileInputStream("C:/Users/User/Desktop/11111/example.xlsx");
         //Workbook wb = new XSSFWorkbook(fileInputStream);
         //FileOutputStream fileOutputStream = new FileOutputStream("C:/Users/User/Desktop/11111/new.xlsx");
-        List<CellReference> referenceList = new ArrayList<>();
-        excel1 excel1 = cat.getBean(excel1.class);
+        //List<CellReference> referenceList = new ArrayList<>();
+        //excel1 excel1 = cat.getBean(excel1.class);
         //List<JournalSiteDTO> journalSites = excel1.getInfo(String.format("group.name==%s;dateOfLesson==%sand%s", "А-33", "2022-03-21", "2022-03-24")).getJournalSites();
-        Map<LocalDate, List<JournalSiteDTO>> map = excel1.getInfo(String.format("group.name==%s;dateOfLesson==%sand%s", "А-33", "2022-03-21", "2022-04-06")).getMap();
+        //Map<LocalDate, List<JournalSiteDTO>> map = excel1.getInfo(String.format("group.name==%s;dateOfLesson==%sand%s", "А-33", "2022-03-21", "2022-04-06")).getMap();
         /*int indexForDate = 0;
         int indexForDateTemp = 0;
         int indexForDateDiscp = 0;

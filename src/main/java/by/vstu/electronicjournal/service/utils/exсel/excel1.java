@@ -71,17 +71,13 @@ public class excel1 {
                 journalSiteDTO1.setDiscipline(journalSiteDTO.getDiscipline());
                 journalSiteDTO1.setTeacher(journalSiteDTO.getTeacher());
                 journalHeaders = new ArrayList<>(journalSiteDTO.getJournalHeaders());
-                System.out.println("-----------------------------------------------");
                 journalHeaders = journalHeaders.stream().filter(journalHeaderDTO -> {
                     if (journalHeaderDTO.getDateOfLesson() != null &&
                             journalHeaderDTO.getDateOfLesson().equals(finalDate)) {
-                        System.out.println(finalDate);
-                        System.out.println(journalHeaderDTO.getId());
                     }
                     return journalHeaderDTO.getDateOfLesson() != null &&
                         journalHeaderDTO.getDateOfLesson().equals(finalDate);
                 }).collect(Collectors.toList());
-                System.out.println("-----------------------------------------------");
                 journalSiteDTO1.setJournalHeaders(journalHeaders);
                 if (journalSiteDTO1.getJournalHeaders().size() != 0) {
 
