@@ -36,9 +36,9 @@ public class ElectronicJournalApplication {
     }
 
     public static void getExcel(ConfigurableApplicationContext cat, String groupName) throws IOException {
-        FileInputStream fileInputStream = new FileInputStream("C:/Users/User/Desktop/projects/actual/ej/example.xlsx");
+        FileInputStream fileInputStream = new FileInputStream("example.xlsx");
         Workbook wb = new XSSFWorkbook(fileInputStream);
-        FileOutputStream fileOutputStream = new FileOutputStream("C:/Users/User/Desktop/projects/actual/ej/new.xlsx");
+        FileOutputStream fileOutputStream = new FileOutputStream("new.xlsx");
         List<CellReference> referenceList = new ArrayList<>();
         excel1 excel1 = cat.getBean(excel1.class);
         //List<JournalSiteDTO> journalSites = excel1.getInfo(String.format("group.name==%s;dateOfLesson==%sand%s", "А-33", "2022-03-21", "2022-03-24")).getJournalSites();
