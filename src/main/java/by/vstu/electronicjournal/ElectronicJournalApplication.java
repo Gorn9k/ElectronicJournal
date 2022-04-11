@@ -36,7 +36,7 @@ public class ElectronicJournalApplication {
     }
 
     public static void getExcel(ConfigurableApplicationContext cat, String groupName) throws IOException {
-        FileInputStream fileInputStream = new FileInputStream("example.xlsx");
+        FileInputStream fileInputStream = new FileInputStream("C:/GornakA/excel/example.xlsx");
         Workbook wb = new XSSFWorkbook(fileInputStream);
         FileOutputStream fileOutputStream = new FileOutputStream("new.xlsx");
         List<CellReference> referenceList = new ArrayList<>();
