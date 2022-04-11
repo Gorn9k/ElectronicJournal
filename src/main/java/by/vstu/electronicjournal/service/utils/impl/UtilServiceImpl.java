@@ -92,7 +92,8 @@ public class UtilServiceImpl implements UtilService {
 					for (JournalHeaderDTO journalHeaderDTO : journalSiteDTO.getJournalHeaders()) {
 						try {
 							if (!journalHeaderDTO.getTypeClass().getName().equals(dto.getTypeClassName()) ||
-									journalHeaderDTO.getDateOfLesson().isEqual(date)) {
+									!journalHeaderDTO.getSubGroup().equals(dto.getSubGroup()) || !journalHeaderDTO.getHoursCount().equals(dto.getLessonNumber())
+									|| journalHeaderDTO.getDateOfLesson().isEqual(date)) {
 								flag = true;
 							}
 						} catch (NullPointerException e) {

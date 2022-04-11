@@ -123,7 +123,7 @@ public class JournalHeaderServiceImpl
             for (PatternDTO patternDTO : patternDTOS) {
                 flag = false;
                 if (!headerDTOS.isEmpty()) {
-                    continue;
+                    break;
                 }
                 if (lessonDays.isEmpty() && lessonNumbers.isEmpty() && subGroups.isEmpty() && groupNames.isEmpty() &&
                         typeClasses.isEmpty() && teacherNames.isEmpty() && locations.isEmpty() && disciplineNames.isEmpty()) {
@@ -178,11 +178,14 @@ public class JournalHeaderServiceImpl
                 }
             }
 
-            List<JournalHeader> journalHeaders = mapper.toEntities(headerDTOS, JournalHeader.class);
-            journalHeaders.stream()
-                    .forEach(journalHeader -> journalHeader.setJournalSite(journalSite));
-            journalSite.setJournalHeaders(journalHeaderRepository.saveAll(journalHeaders));
+            if (!headerDTOS.isEmpty()) {
+                List<JournalHeader> journalHeaders = mapper.toEntities(headerDTOS, JournalHeader.class);
+                journalHeaders.stream()
+                        .forEach(journalHeader -> journalHeader.setJournalSite(journalSite));
+                journalSite.setJournalHeaders(journalHeaderRepository.saveAll(journalHeaders));
+            }
         }
+
         return params;
     }
 
