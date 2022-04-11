@@ -42,7 +42,7 @@ public class excel1 {
     private JournalContentService journalContentService;
 
     public excel1 getInfo(String query) {
-        journalSites = journalSiteService.search("group.name==А-33");
+        journalSites = journalSiteService.search(query.split(";")[0]);
         int year = 0, month = 0, dayOfMonth;
         LocalDate after, before;
         year = Integer.parseInt(query.split("==")[2].split("and")[0].split("-")[0]);
@@ -81,11 +81,6 @@ public class excel1 {
             dates.add(date);
             map.put(date, journalSiteDTOList1);
         }
-        map.entrySet().forEach(localDateListEntry -> {
-            System.out.println(localDateListEntry.getKey() + "->");
-            localDateListEntry.getValue().forEach(journalSiteDTO -> System.out.println(journalSiteDTO.getTeacher().getSurname() + " " + journalSiteDTO.getJournalHeaders().size()));
-        });
-
 
         excel1.setJournalSites(journalSites);
         excel1.setMap(map);
