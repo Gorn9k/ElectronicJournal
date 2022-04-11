@@ -93,6 +93,15 @@ public class JournalHeaderServiceImpl
 
         RestTemplate restTemplate = new RestTemplate();
 
+        List<String> lessonDays = new ArrayList<>();
+        List<Integer> lessonNumbers = new ArrayList<>();
+        List<Integer> subGroups = new ArrayList<>();
+        List<String> groupNames = new ArrayList<>();
+        List<String> typeClasses = new ArrayList<>();
+        List<String> teacherNames = new ArrayList<>();
+        List<String> locations = new ArrayList<>();
+        List<String> disciplineNames = new ArrayList<>();
+
         for (JournalSite journalSite : params) {
 
             String queryToCommonInfo = String.format(
@@ -109,15 +118,64 @@ public class JournalHeaderServiceImpl
 
             List<JournalHeaderDTO> headerDTOS = new ArrayList<>();
 
-            for (PatternDTO patternDTO : patternDTOS) {
-                JournalHeaderDTO journalHeaderDTO = new JournalHeaderDTO();
-                journalHeaderDTO.setSubGroup(patternDTO.getSubGroup());
-                journalHeaderDTO.setHoursCount(patternDTO.getLessonNumber());
-                TypeClassDTO typeClassDTO = typeClassService
-                        .validator("name==\'" + patternDTO.getTypeClassName() + "\'").get(0);
-                journalHeaderDTO.setTypeClass(typeClassDTO);
+            boolean flag;
 
-                headerDTOS.add(journalHeaderDTO);
+            for (PatternDTO patternDTO : patternDTOS) {
+                flag = false;
+                if (!headerDTOS.isEmpty()) {
+                    continue;
+                }
+                if (lessonDays.isEmpty() && lessonNumbers.isEmpty() && subGroups.isEmpty() && groupNames.isEmpty() &&
+                        typeClasses.isEmpty() && teacherNames.isEmpty() && locations.isEmpty() && disciplineNames.isEmpty()) {
+                    lessonDays.add(patternDTO.getLessonDay());
+                    lessonNumbers.add(patternDTO.getLessonNumber());
+                    subGroups.add(patternDTO.getSubGroup());
+                    groupNames.add(patternDTO.getGroupName());
+                    typeClasses.add(patternDTO.getTypeClassName());
+                    teacherNames.add(patternDTO.getTeacherFio());
+                    locations.add(patternDTO.getLocation());
+                    disciplineNames.add(patternDTO.getDisciplineName());
+                    JournalHeaderDTO journalHeaderDTO = new JournalHeaderDTO();
+                    journalHeaderDTO.setSubGroup(patternDTO.getSubGroup());
+                    journalHeaderDTO.setHoursCount(patternDTO.getLessonNumber());
+                    journalHeaderDTO.setStatus(Status.ACTIVE);
+                    TypeClassDTO typeClassDTO = typeClassService
+                            .validator("name==\'" + patternDTO.getTypeClassName() + "\'").get(0);
+                    journalHeaderDTO.setTypeClass(typeClassDTO);
+
+                    headerDTOS.add(journalHeaderDTO);
+                } else {
+                    for (int i = 0; i < lessonDays.size(); i++) {
+                        if (lessonDays.get(i).equals(patternDTO.getLessonDay()) &&
+                                lessonNumbers.get(i).equals(patternDTO.getLessonNumber()) &&
+                                subGroups.get(i).equals(patternDTO.getSubGroup()) &&
+                                groupNames.get(i).equals(patternDTO.getGroupName()) &&
+                                typeClasses.get(i).equals(patternDTO.getTypeClassName()) &&
+                                teacherNames.get(i).equals(patternDTO.getTeacherFio()) &&
+                                locations.get(i).equals(patternDTO.getLocation()) && disciplineNames.get(i).equals(patternDTO.getDisciplineName())) {
+                                flag = true;
+                        }
+                    }
+                    if (!flag) {
+                        lessonDays.add(patternDTO.getLessonDay());
+                        lessonNumbers.add(patternDTO.getLessonNumber());
+                        subGroups.add(patternDTO.getSubGroup());
+                        groupNames.add(patternDTO.getGroupName());
+                        typeClasses.add(patternDTO.getTypeClassName());
+                        teacherNames.add(patternDTO.getTeacherFio());
+                        locations.add(patternDTO.getLocation());
+                        disciplineNames.add(patternDTO.getDisciplineName());
+                        JournalHeaderDTO journalHeaderDTO = new JournalHeaderDTO();
+                        journalHeaderDTO.setSubGroup(patternDTO.getSubGroup());
+                        journalHeaderDTO.setHoursCount(patternDTO.getLessonNumber());
+                        journalHeaderDTO.setStatus(Status.ACTIVE);
+                        TypeClassDTO typeClassDTO = typeClassService
+                                .validator("name==\'" + patternDTO.getTypeClassName() + "\'").get(0);
+                        journalHeaderDTO.setTypeClass(typeClassDTO);
+
+                        headerDTOS.add(journalHeaderDTO);
+                    }
+                }
             }
 
             List<JournalHeader> journalHeaders = mapper.toEntities(headerDTOS, JournalHeader.class);

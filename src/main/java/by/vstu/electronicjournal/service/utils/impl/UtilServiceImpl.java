@@ -14,6 +14,7 @@ import by.vstu.electronicjournal.service.utils.UtilService;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +69,8 @@ public class UtilServiceImpl implements UtilService {
 		dayOfMonth = Integer.parseInt(query.split("-")[4]);
 		before = LocalDate.of(year, month, dayOfMonth).plusDays(1);
 
+		List<ContentDTO> usedContentDTOS = new ArrayList<>();
+
 		System.out.println(LocalTime.now());
 		for (LocalDate date = after; date.isBefore(before); date = date.plusDays(1)) {
 			for (ContentDTO dto : getContentFromTimetable(date)) {
@@ -84,21 +87,14 @@ public class UtilServiceImpl implements UtilService {
 				);
 				for (JournalSiteDTO journalSiteDTO : siteDTOS) {
 
-					JournalHeaderDTO journalHeaderDTOWithoutDate = null;
-
 					boolean flag = false;
 
 					for (JournalHeaderDTO journalHeaderDTO : journalSiteDTO.getJournalHeaders()) {
 						try {
-							if (journalHeaderDTO.getDateOfLesson() != null ||
-									!journalHeaderDTO.getTypeClass().getName().equals(dto.getTypeClassName())) {
-								if (journalHeaderDTO.getDateOfLesson().isEqual(date)) {
-									flag = true;
-								}
-							} else {
-								journalHeaderDTOWithoutDate = new JournalHeaderDTO();
+							if (!journalHeaderDTO.getTypeClass().getName().equals(dto.getTypeClassName()) ||
+									journalHeaderDTO.getDateOfLesson().isEqual(date)) {
+								flag = true;
 							}
-
 						} catch (NullPointerException e) {
 							continue;
 						}
@@ -109,16 +105,18 @@ public class UtilServiceImpl implements UtilService {
 						continue;
 					}
 
-					if (journalHeaderDTOWithoutDate != null) {
+					if (usedContentDTOS.isEmpty() || !usedContentDTOS.contains(dto)) {
+						usedContentDTOS.add(dto);
 						ParamsForCreateJournalHeader params = new ParamsForCreateJournalHeader();
-						journalHeaderDTOWithoutDate.setHoursCount(dto.getLessonNumber());
-						journalHeaderDTOWithoutDate.setSubGroup(dto.getSubGroup());
-						journalHeaderDTOWithoutDate.setDateOfLesson(dto.getLessonDate());
-						journalHeaderDTOWithoutDate.setTypeClass(
+						JournalHeaderDTO journalHeaderDTO = new JournalHeaderDTO();
+						journalHeaderDTO.setHoursCount(dto.getLessonNumber());
+						journalHeaderDTO.setSubGroup(dto.getSubGroup());
+						journalHeaderDTO.setDateOfLesson(dto.getLessonDate());
+						journalHeaderDTO.setTypeClass(
 								typeClassService.validator("name==\'" + dto.getTypeClassName() + "\'").get(0));
 
 						params.setJournalSiteId(journalSiteDTO.getId());
-						params.setJournalHeaderDTO(journalHeaderDTOWithoutDate);
+						params.setJournalHeaderDTO(journalHeaderDTO);
 
 						journalHeaderService.create(params);
 					}
