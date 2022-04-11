@@ -35,7 +35,7 @@ public class ElectronicJournalApplication {
         cat = SpringApplication.run(ElectronicJournalApplication.class, args);
     }
 
-    public static Workbook getExcel(ConfigurableApplicationContext cat, String groupName) throws IOException {
+public static Workbook getExcel(ConfigurableApplicationContext cat, String groupName) throws IOException {
         FileInputStream fileInputStream = new FileInputStream("C:/GornakA/excel/example.xlsx");
         Workbook wb = new XSSFWorkbook(fileInputStream);
         List<CellReference> referenceList = new ArrayList<>();
