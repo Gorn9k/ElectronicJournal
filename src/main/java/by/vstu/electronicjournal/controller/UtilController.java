@@ -37,15 +37,14 @@ public class UtilController {
 
         //тут дальше создаем файл
         ElectronicJournalApplication.getExcel(ElectronicJournalApplication.cat, groupName);
-        FileInputStream fileInputStream = new FileInputStream("C:/Users/User/Desktop/projects/actual/ej/new.xlsx");
         response.setHeader("Content-Disposition", "inline;filename=\"" + URLEncoder.encode("new.xlsx", "UTF-8") + "\"");
         response.setContentType("application/xlsx");
 
-        Workbook workbook = new XSSFWorkbook(fileInputStream);
+        Workbook workbook = ElectronicJournalApplication.getExcel(ElectronicJournalApplication.cat, groupName);
         OutputStream outputStream = response.getOutputStream();
 
         workbook.write(outputStream);
-
+        workbook.close();
         outputStream.flush();
         outputStream.close();
 
