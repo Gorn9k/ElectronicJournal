@@ -26,6 +26,34 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+package by.vstu.electronicjournal;
+
+import by.vstu.electronicjournal.dto.*;
+import by.vstu.electronicjournal.entity.JournalContent;
+import by.vstu.electronicjournal.entity.JournalSite;
+import by.vstu.electronicjournal.entity.Teacher;
+import by.vstu.electronicjournal.service.utils.exсel.excel1;
+import liquibase.pro.packaged.A;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellAddress;
+import org.apache.poi.ss.util.CellReference;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestTemplate;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
+
 @SpringBootApplication
 public class ElectronicJournalApplication {
 
@@ -35,14 +63,13 @@ public class ElectronicJournalApplication {
         cat = SpringApplication.run(ElectronicJournalApplication.class, args);
     }
 
-public static Workbook getExcel(ConfigurableApplicationContext cat, String groupName) throws IOException {
+    public static Workbook getExcel(ConfigurableApplicationContext cat, String groupName) throws IOException {
         FileInputStream fileInputStream = new FileInputStream("C:/GornakA/excel/example.xlsx");
         Workbook wb = new XSSFWorkbook(fileInputStream);
         List<CellReference> referenceList = new ArrayList<>();
         excel1 excel1 = cat.getBean(excel1.class);
         //List<JournalSiteDTO> journalSites = excel1.getInfo(String.format("group.name==%s;dateOfLesson==%sand%s", "А-33", "2022-03-21", "2022-03-24")).getJournalSites();
         Map<LocalDate, List<JournalSiteDTO>> map = excel1.getInfo(String.format("group.name==%s;dateOfLesson==%sand%s", groupName, "2022-03-21", "2022-04-06")).getMap();
-
         int indexForDate = 0;
         int indexForDateTemp = 0;
         int indexForDateDiscp = 0;
@@ -55,6 +82,8 @@ public static Workbook getExcel(ConfigurableApplicationContext cat, String group
         int fde = 0;
         int ij = 0;
         int nomer = 0;
+        int newpage = 0;
+        int fornewpage = 0;
         for (int index = 0; index < wb.getNumberOfSheets(); index++) {
             int i = 0, j = 0;
             int indexForTeacher = 0;
@@ -66,15 +95,19 @@ public static Workbook getExcel(ConfigurableApplicationContext cat, String group
             forde = 0;
             fde = index;
             rte = 0;
+            fornewpage = indexForDate;
             for (Row row : wb.getSheetAt(index)) {
                 for (Cell cell : row) {
                     if (index == 0) {
                         if ((i == 0 && j == 1) || (i >= 11 && i <= 36 && j >= 0 && j < 2)) {
-                            if (j== 0 && (i >= 11 && i <= 40)) {
-                                cell.setCellValue(nomer);
-                                if(map.get(excel1.getDates().get(0)).
+                            if (j == 0 && (i >= 11 && i <= 40)) {
+                                if (map.get(excel1.getDates().get(0)).
+                                        get(0).getJournalHeaders().get(0).getJournalContents().size() > nomer) {
+                                    cell.setCellValue(nomer + 1);
+                                }
+                                if (map.get(excel1.getDates().get(0)).
                                         get(0).getJournalHeaders().get(0).getJournalContents().size() >= nomer) {
-                                     nomer++;
+                                    nomer++;
                                 }
 
                             }
@@ -179,29 +212,27 @@ public static Workbook getExcel(ConfigurableApplicationContext cat, String group
                             indexForDateDate++;
                         }
                     } else if (i >= 11 && i <= 36 && j >= 0 && j < 72) {
-                        if (j == 0) {
+                        if (j == 0 && map.get(excel1.getDates().get(0)).
+                                get(0).getJournalHeaders().get(0).getJournalContents().size() > rte) {
                             cell.setCellValue(rte + 1);
                         }
                         if (j == 1) {
-                            if (map.get(excel1.getDates().get(indexForDateStudent)).
-                                    get(inx).getJournalHeaders().get(0).getJournalContents().size() > 1) {
                                 try {
-                                    StudentDTO studentDTO = map.get(excel1.getDates().get(indexForDateStudent)).
+                                    StudentDTO studentDTO = map.get(excel1.getDates().get(newpage)).
                                             get(inx).getJournalHeaders().get(0).getJournalContents().get(rte).getStudent();
                                     cell.setCellValue(studentDTO.getSurname() + " " + studentDTO.getName().toUpperCase().charAt(0) + ". " +
                                             studentDTO.getPatronymic().toUpperCase().charAt(0) + ".");
                                 } catch (Exception e) {
                                     cell.setCellValue("");
                                 }
-                            }
+
                         }
                         if (j >= 2) {
-                            if (excel1.getDates().size() > indexForDateStudent && map.get(excel1.getDates().get(indexForDateStudent)).size() > inx && j % 2 == 0 &&
-                                    forde++ < map.get(excel1.getDates().get(indexForDateStudent)).size()) {
-                                if (map.get(excel1.getDates().get(indexForDateStudent)).
-                                        get(inx).getJournalHeaders().get(0).getJournalContents().size() > 1) {
+                            try {
+                                if (excel1.getDates().size() + 4 >= indexForDate + indexForDateStudent && map.get(excel1.getDates().get(newpage)).size() > inx && j % 2 == 0 &&
+                                        forde++ < map.get(excel1.getDates().get(newpage)).size()) {
                                     try {
-                                        JournalContentDTO journalContent = map.get(excel1.getDates().get(indexForDateStudent)).
+                                        JournalContentDTO journalContent = map.get(excel1.getDates().get(newpage)).
                                                 get(inx++).getJournalHeaders().get(0).getJournalContents().get(rte);
                                         if (journalContent.getPresence() == null || journalContent.getPresence().equals(false)) {
                                             cell.setCellValue(2);
@@ -211,7 +242,12 @@ public static Workbook getExcel(ConfigurableApplicationContext cat, String group
                                     } catch (Exception e) {
                                         cell.setCellValue("");
                                     }
+
+                                } else {
+                                    cell.setCellValue("");
                                 }
+                            } catch (Exception e) {
+                                cell.setCellValue("");
                             }
                         }
                         if (j != 0 && j % 14 == 0) {
@@ -219,6 +255,7 @@ public static Workbook getExcel(ConfigurableApplicationContext cat, String group
                             forde = 0;
                             inx = 0;
                             forpage++;
+                            newpage++;
                         }
                     }
                     j++;
@@ -228,8 +265,13 @@ public static Workbook getExcel(ConfigurableApplicationContext cat, String group
                     rte++;
                 }
                 i++;
-                j = 0;
                 indexForDateStudent = 0;
+                if (index==1) {
+                    newpage = 0;
+                } else {
+                    newpage = indexForDate - 5;
+                }
+                j = 0;
                 inx = 0;
             }
             if (index != 0) {
@@ -273,3 +315,4 @@ public static Workbook getExcel(ConfigurableApplicationContext cat, String group
         return builder.build();
     }
 }
+
