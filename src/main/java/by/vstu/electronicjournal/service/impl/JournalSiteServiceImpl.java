@@ -187,8 +187,9 @@ public class JournalSiteServiceImpl
         List<JournalSite> journalSites = journalSiteRepository.findByTeacherIdFromSourceAndGroupNameAndDisciplineId(teacherIdFromSource, groupName, disciplineId);
         JournalSite journalSite = journalSites.get(0);
         List<JournalHeader> journalHeaders = new ArrayList<>();
-        journalSites.stream().forEach(journalSite1 -> journalHeaders.addAll(journalSite1.getJournalHeaders()));
-        journalHeaders.stream().filter(journalHeader -> journalHeader.getTypeClass().getId().equals(typeClassId) &&
+        List<JournalHeader> finalJournalHeaders = journalHeaders;
+        journalSites.stream().forEach(journalSite1 -> finalJournalHeaders.addAll(journalSite1.getJournalHeaders()));
+        journalHeaders = journalHeaders.stream().filter(journalHeader -> journalHeader.getTypeClass().getId().equals(typeClassId) &&
                 journalHeader.getSubGroup().equals(subGroupNumber) && journalHeader.getDateOfLesson() != null).collect(Collectors.toList());
         journalSite.setJournalHeaders(journalHeaders);
         return (JournalSiteDTO) mapper.toDTO(journalSite, JournalSiteDTO.class);
