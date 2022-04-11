@@ -72,6 +72,8 @@ public class ElectronicJournalApplication {
                         cell.getCellStyle().setFillForegroundColor(IndexedColors.WHITE.getIndex());
                     }
 
+                     */
+/*
 
                     else if (i == 0 && j == 1) {
                         cell.setCellValue("А-33");
@@ -166,28 +168,25 @@ public class ElectronicJournalApplication {
                             cell.setCellValue(rte);
                             System.out.println(rte);
                         }
-                        /*if (j == 1) {
-                            StudentDTO studentDTO = map.get(excel1.getDates().get(indexForDateStudent)).
-                                    get(inx++).getJournalHeaders().get(0).getJournalContents().get(rte).getStudent();
-                            cell.setCellValue(studentDTO.getSurname() + " " + studentDTO.getName() + " " + studentDTO.getPatronymic());
+                        if (j == 1) {
+                            if (map.get(excel1.getDates().get(indexForDateStudent)).
+                                    get(inx++).getJournalHeaders().get(0).getJournalContents().size() > 1) {
+                                StudentDTO studentDTO = map.get(excel1.getDates().get(indexForDateStudent)).
+                                        get(inx++).getJournalHeaders().get(0).getJournalContents().get(rte).getStudent();
+                                cell.setCellValue(studentDTO.getSurname() + " " + studentDTO.getName() + " " + studentDTO.getPatronymic());
+                            }
                         }
                         if (j >= 2) {
                             if (excel1.getDates().size() > indexForDateStudent && map.get(excel1.getDates().get(indexForDateStudent)).size() > inx && j % 2 == 0) {
-                                System.out.println(excel1.getDates().get(indexForDateStudent));
-                                System.out.println(map.get(excel1.getDates().get(indexForDateStudent)).
-                                        get(inx).getJournalHeaders().get(0).getId());
-                                System.out.println(map.get(excel1.getDates().get(indexForDateStudent)).
-                                        get(inx).getTeacher().getSurname());
-                                System.out.println(map.get(excel1.getDates().get(indexForDateStudent)).
-                                        get(inx).getJournalHeaders().get(0).getTypeClass().getName());
-                                System.out.println(map.get(excel1.getDates().get(indexForDateStudent)).
-                                        get(inx).getJournalHeaders().get(0).getJournalContents().get(0).getStudent().getSurname());
-                                JournalContentDTO journalContent = map.get(excel1.getDates().get(indexForDateStudent)).
-                                        get(inx++).getJournalHeaders().get(0).getJournalContents().get(rte);
-                                if (journalContent.getPresence() == null) {
-                                    cell.setCellValue(2);
-                                } else {
-                                    cell.setCellValue("");
+                                if (map.get(excel1.getDates().get(indexForDateStudent)).
+                                        get(inx++).getJournalHeaders().get(0).getJournalContents().size() > 1) {
+                                    JournalContentDTO journalContent = map.get(excel1.getDates().get(indexForDateStudent)).
+                                            get(inx++).getJournalHeaders().get(0).getJournalContents().get(rte);
+                                    if (journalContent.getPresence() == null || journalContent.getPresence().equals(false)) {
+                                        cell.setCellValue(2);
+                                    } else {
+                                        cell.setCellValue("");
+                                    }
                                 }
                             }
                         }
@@ -219,7 +218,7 @@ public class ElectronicJournalApplication {
         wb.close();
         fileInputStream.close();
         fileOutputStream.close();
-        */
+*/
     }
 
     public static String getCellText(Cell cell) {
