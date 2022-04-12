@@ -59,7 +59,7 @@ public class UtilServiceImpl implements UtilService {
 
 		int year = 0, month = 0, dayOfMonth;
 		LocalDate after, before;
-		String query = "2022-03-21and2022-04-08";
+		String query = "2022-04-09and2022-04-12";
 		year = Integer.parseInt(query.split("-")[0]);
 		month = Integer.parseInt(query.split("-")[1]);
 		dayOfMonth = Integer.parseInt(query.split("-")[2].split("and")[0]);
