@@ -63,7 +63,7 @@ public class ElectronicJournalApplication {
     }
 
     public static Workbook getExcel(ConfigurableApplicationContext cat, String groupName) throws IOException {
-        FileInputStream fileInputStream = new FileInputStream("C:/GornakA/excel/example.xlsx");
+        FileInputStream fileInputStream = new FileInputStream("C:/Users/User/Desktop/example.xlsx");
         Workbook wb = new XSSFWorkbook(fileInputStream);
         List<CellReference> referenceList = new ArrayList<>();
         excel1 excel1 = cat.getBean(excel1.class);
@@ -112,10 +112,12 @@ public class ElectronicJournalApplication {
                             }
                             if (j == 1 && (i >= 11 && i <= 40)) {
                                 try {
-                                    StudentDTO studentDTO = map.get(excel1.getDates().get(0)).
-                                            get(0).getJournalHeaders().get(0).getJournalContents().get(ij++).getStudent();
-                                    cell.setCellValue(studentDTO.getSurname() + " " + studentDTO.getName().toUpperCase().charAt(0) + ". " +
-                                            studentDTO.getPatronymic().toUpperCase().charAt(0) + ".");
+                                    Set<String> set = new TreeSet<>(map.get(excel1.getDates().get(0)).
+                                            get(0).getJournalHeaders().get(0).getJournalContents().stream().map(journalContentDTO ->
+                                            journalContentDTO.getStudent().getSurname() + " " + journalContentDTO.getStudent().getName().toUpperCase().charAt(0) + ". " +
+                                                    journalContentDTO.getStudent().getPatronymic().toUpperCase().charAt(0) + ".").collect(Collectors.toList()));
+                                    String name = new ArrayList<>(set).get(ij++);
+                                    cell.setCellValue(name);
                                 } catch (Exception e) {
                                     cell.setCellValue("");
                                 }
@@ -215,10 +217,12 @@ public class ElectronicJournalApplication {
                         }
                         if (j == 1) {
                                 try {
-                                    StudentDTO studentDTO = map.get(excel1.getDates().get(newpage)).
-                                            get(inx).getJournalHeaders().get(0).getJournalContents().get(rte).getStudent();
-                                    cell.setCellValue(studentDTO.getSurname() + " " + studentDTO.getName().toUpperCase().charAt(0) + ". " +
-                                            studentDTO.getPatronymic().toUpperCase().charAt(0) + ".");
+                                    Set<String> set = new TreeSet<>(map.get(excel1.getDates().get(newpage)).
+                                            get(inx).getJournalHeaders().get(0).getJournalContents().stream().map(journalContentDTO ->
+                                            journalContentDTO.getStudent().getSurname() + " " + journalContentDTO.getStudent().getName().toUpperCase().charAt(0) + ". " +
+                                                    journalContentDTO.getStudent().getPatronymic().toUpperCase().charAt(0) + ".").collect(Collectors.toList()));
+                                    String name = new ArrayList<>(set).get(rte);
+                                    cell.setCellValue(name);
                                 } catch (Exception e) {
                                     cell.setCellValue("");
                                 }
@@ -229,8 +233,9 @@ public class ElectronicJournalApplication {
                                 if (excel1.getDates().size() + 4 >= indexForDate + indexForDateStudent && map.get(excel1.getDates().get(newpage)).size() > inx && j % 2 == 0 &&
                                         forde++ < map.get(excel1.getDates().get(newpage)).size()) {
                                     try {
-                                        JournalContentDTO journalContent = map.get(excel1.getDates().get(newpage)).
-                                                get(inx).getJournalHeaders().get(0).getJournalContents().get(rte);
+                                        Set<JournalContentDTO> set = new TreeSet<>(map.get(excel1.getDates().get(newpage)).
+                                                get(inx).getJournalHeaders().get(0).getJournalContents());
+                                        JournalContentDTO journalContent = new ArrayList<>(set).get(rte);
                                         //System.out.println(excel1.getDates().get(newpage));
                                         //System.out.println(map.get(excel1.getDates().get(newpage)).
                                         //        get(inx).getDiscipline().getName());
@@ -244,7 +249,7 @@ public class ElectronicJournalApplication {
                                         inx++;
                                     } catch (Exception e) {
                                         CellReference cellReference = new CellReference(cell);
-                                        System.out.println(cellReference.formatAsString());
+                                        //System.out.println(cellReference.formatAsString());
                                         inx++;
                                         cell.setCellValue("");
                                     }

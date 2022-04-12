@@ -14,6 +14,7 @@ import by.vstu.electronicjournal.service.JournalContentService;
 import by.vstu.electronicjournal.service.JournalHeaderService;
 import by.vstu.electronicjournal.service.JournalSiteService;
 import lombok.Data;
+import org.apache.poi.ss.usermodel.Cell;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -86,38 +87,41 @@ public class excel1 {
         excel1.setJournalSites(journalSites);
         excel1.setMap(map);
         excel1.setDates(dates);
-       /* method(map).entrySet().stream().forEach(stringListEntry -> {
+        /*method(map).entrySet().stream().forEach(stringListEntry -> {
             System.out.println(stringListEntry.getKey());
             stringListEntry.getValue().entrySet().stream().forEach(stringBooleanEntry -> {
                 System.out.println(stringBooleanEntry.getKey());
                 stringBooleanEntry.getValue().entrySet().stream().forEach(stringBooleanEntry1 -> {
-                    System.out.println(stringBooleanEntry1.getKey());
+                    System.out.println(stringBooleanEntry1.getKey().getTeacher().getSurname());
+                    System.out.println(stringBooleanEntry1.getKey().getDiscipline().getName());
                     System.out.println(stringBooleanEntry1.getValue());
                 });
             });
         });
 
-        */
+         */
+
+
+
         return excel1;
     }
 
 
-    public Map<String, Map<LocalDate, Map<String, Boolean>>> method(Map<LocalDate, List<JournalSiteDTO>> map) {
-        Map<String, Map<LocalDate, Map<String, Boolean>>> map1 = new HashMap<>();
-        List<JournalContentDTO> journalContentDTOList = new ArrayList<>();
-        Set<String> set = new HashSet();
+    public Map<String, Map<LocalDate, Map<JournalSiteDTO, Boolean>>> method(Map<LocalDate, List<JournalSiteDTO>> map) {
+        Map<String, Map<LocalDate, Map<JournalSiteDTO, Boolean>>> map1 = new HashMap<>();
+        Set<String> set = new TreeSet<>();
         map.values().stream().forEach(journalSiteDTOS -> journalSiteDTOS.stream().forEach(journalSiteDTO ->
                 journalSiteDTO.getJournalHeaders().get(0).getJournalContents().stream().forEach(journalContentDTO ->
-                        set.add(journalContentDTO.getStudent().getSurname() + " " + journalContentDTO.getStudent().getName() + "." +
-                                journalContentDTO.getStudent().getPatronymic() + "."))));
+                        set.add(journalContentDTO.getStudent().getSurname() + " " + journalContentDTO.getStudent().getName().toUpperCase().charAt(0) + "." +
+                                journalContentDTO.getStudent().getPatronymic().toUpperCase().charAt(0) + "."))));
         set.stream().forEach(studentName -> {
-            Map<String, Boolean> stringBooleanMap = new HashMap<>();
-            Map<LocalDate, Map<String, Boolean>> mapDate = new HashMap<>();
+            Map<JournalSiteDTO, Boolean> stringBooleanMap = new HashMap<>();
+            Map<LocalDate, Map<JournalSiteDTO, Boolean>> mapDate = new HashMap<>();
             map.keySet().stream().forEach(date -> {
                     map.get(date).stream().forEach(journalSiteDTO -> journalSiteDTO.getJournalHeaders().get(0).getJournalContents().stream().forEach(journalContentDTO -> {
-                        if ((journalContentDTO.getStudent().getSurname() + " " + journalContentDTO.getStudent().getName() + "." +
-                                journalContentDTO.getStudent().getPatronymic() + ".").equals(studentName)) {
-                            stringBooleanMap.put(journalSiteDTO.getDiscipline().getName(), journalContentDTO.getPresence());
+                        if ((journalContentDTO.getStudent().getSurname() + " " + journalContentDTO.getStudent().getName().toUpperCase().charAt(0) + "." +
+                                journalContentDTO.getStudent().getPatronymic().toUpperCase().charAt(0) + ".").equals(studentName)) {
+                            stringBooleanMap.put(journalSiteDTO, journalContentDTO.getPresence());
                         }
                     }));
                     mapDate.put(date, stringBooleanMap);
@@ -125,5 +129,9 @@ public class excel1 {
             map1.put(studentName, mapDate);
         });
         return map1;
+    }
+
+    public void setValue(Cell cell, Map<String, Map<LocalDate, Map<JournalSiteDTO, Boolean>>> map) {
+
     }
 }

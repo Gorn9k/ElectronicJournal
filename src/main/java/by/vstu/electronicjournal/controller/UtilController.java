@@ -36,7 +36,6 @@ public class UtilController {
     public void getExcel(HttpServletResponse response, @RequestParam String groupName) throws IOException {
 
         //тут дальше создаем файл
-        ElectronicJournalApplication.getExcel(ElectronicJournalApplication.cat, groupName);
         response.setHeader("Content-Disposition", "inline;filename=\"" + URLEncoder.encode("new.xlsx", "UTF-8") + "\"");
         response.setContentType("application/xlsx");
 
