@@ -96,6 +96,7 @@ public class ElectronicJournalApplication {
             rte = 0;
             fornewpage = indexForDate;
             for (Row row : wb.getSheetAt(index)) {
+                String nameForContent = null;
                 for (Cell cell : row) {
                     if (index == 0) {
                         if ((i == 0 && j == 1) || (i >= 11 && i <= 36 && j >= 0 && j < 2)) {
@@ -211,6 +212,7 @@ public class ElectronicJournalApplication {
                             indexForDateDate++;
                         }
                     } else if (i >= 11 && i <= 36 && j >= 0 && j < 72) {
+
                         if (j == 0 && map.get(excel1.getDates().get(0)).
                                 get(0).getJournalHeaders().get(0).getJournalContents().size() > rte) {
                             cell.setCellValue(rte + 1);
@@ -219,10 +221,10 @@ public class ElectronicJournalApplication {
                                 try {
                                     Set<String> set = new TreeSet<>(map.get(excel1.getDates().get(newpage)).
                                             get(inx).getJournalHeaders().get(0).getJournalContents().stream().map(journalContentDTO ->
-                                            journalContentDTO.getStudent().getSurname() + " " + journalContentDTO.getStudent().getName().toUpperCase().charAt(0) + ". " +
+                                            journalContentDTO.getStudent().getSurname() + " " + journalContentDTO.getStudent().getName().toUpperCase().charAt(0) + "." +
                                                     journalContentDTO.getStudent().getPatronymic().toUpperCase().charAt(0) + ".").collect(Collectors.toList()));
-                                    String name = new ArrayList<>(set).get(rte);
-                                    cell.setCellValue(name);
+                                    nameForContent = new ArrayList<>(set).get(rte);
+                                    cell.setCellValue(nameForContent);
                                 } catch (Exception e) {
                                     cell.setCellValue("");
                                 }
@@ -232,24 +234,26 @@ public class ElectronicJournalApplication {
                             try {
                                 if (excel1.getDates().size() + 4 >= indexForDate + indexForDateStudent && map.get(excel1.getDates().get(newpage)).size() > inx && j % 2 == 0 &&
                                         forde++ < map.get(excel1.getDates().get(newpage)).size()) {
+                                    JournalContentDTO journalContent;
                                     try {
                                         Set<JournalContentDTO> set = new TreeSet<>(map.get(excel1.getDates().get(newpage)).
                                                 get(inx).getJournalHeaders().get(0).getJournalContents());
-                                        JournalContentDTO journalContent = new ArrayList<>(set).get(rte);
+                                        journalContent = new ArrayList<>(set).get(rte);
                                         //System.out.println(excel1.getDates().get(newpage));
                                         //System.out.println(map.get(excel1.getDates().get(newpage)).
                                         //        get(inx).getDiscipline().getName());
                                         //System.out.println(journalContent.getStudent().getSurname());
                                         //System.out.println(journalContent.getPresence());
-                                        if (journalContent.getPresence() == null || journalContent.getPresence().equals(false)) {
+                                        if ((journalContent.getStudent().getSurname() + " " + journalContent.getStudent().getName().toUpperCase().charAt(0) +
+                                                "." + journalContent.getStudent().getPatronymic().toUpperCase().charAt(0) + ".").equals(nameForContent) &&
+                                                journalContent.getPresence() == null || journalContent.getPresence().equals(false)) {
                                             cell.setCellValue(2);
                                         } else {
                                             cell.setCellValue("");
                                         }
                                         inx++;
                                     } catch (Exception e) {
-                                        CellReference cellReference = new CellReference(cell);
-                                        //System.out.println(cellReference.formatAsString());
+
                                         inx++;
                                         cell.setCellValue("");
                                     }
