@@ -3,6 +3,7 @@ package by.vstu.electronicjournal.service.utils.exсel;
 import by.vstu.electronicjournal.dto.JournalContentDTO;
 import by.vstu.electronicjournal.dto.JournalHeaderDTO;
 import by.vstu.electronicjournal.dto.JournalSiteDTO;
+import by.vstu.electronicjournal.dto.StudentDTO;
 import by.vstu.electronicjournal.entity.JournalContent;
 import by.vstu.electronicjournal.entity.JournalHeader;
 import by.vstu.electronicjournal.entity.JournalSite;
@@ -72,10 +73,10 @@ public class excel1 {
                 journalSiteDTO1.setTeacher(journalSiteDTO.getTeacher());
                 journalHeaders = new ArrayList<>(journalSiteDTO.getJournalHeaders());
                 journalHeaders = journalHeaders.stream().filter(journalHeaderDTO -> journalHeaderDTO.getDateOfLesson() != null &&
-                    journalHeaderDTO.getDateOfLesson().equals(finalDate)).collect(Collectors.toList());
+                        journalHeaderDTO.getDateOfLesson().equals(finalDate)).collect(Collectors.toList());
                 journalSiteDTO1.setJournalHeaders(journalHeaders);
                 if (journalSiteDTO1.getJournalHeaders().size() != 0) {
-                        finalJournalSiteDTOList.add(journalSiteDTO1);
+                    finalJournalSiteDTOList.add(journalSiteDTO1);
                 }
             });
             dates.add(date);
@@ -85,6 +86,44 @@ public class excel1 {
         excel1.setJournalSites(journalSites);
         excel1.setMap(map);
         excel1.setDates(dates);
+       /* method(map).entrySet().stream().forEach(stringListEntry -> {
+            System.out.println(stringListEntry.getKey());
+            stringListEntry.getValue().entrySet().stream().forEach(stringBooleanEntry -> {
+                System.out.println(stringBooleanEntry.getKey());
+                stringBooleanEntry.getValue().entrySet().stream().forEach(stringBooleanEntry1 -> {
+                    System.out.println(stringBooleanEntry1.getKey());
+                    System.out.println(stringBooleanEntry1.getValue());
+                });
+            });
+        });
+
+        */
         return excel1;
+    }
+
+
+    public Map<String, Map<LocalDate, Map<String, Boolean>>> method(Map<LocalDate, List<JournalSiteDTO>> map) {
+        Map<String, Map<LocalDate, Map<String, Boolean>>> map1 = new HashMap<>();
+        List<JournalContentDTO> journalContentDTOList = new ArrayList<>();
+        Set<String> set = new HashSet();
+        map.values().stream().forEach(journalSiteDTOS -> journalSiteDTOS.stream().forEach(journalSiteDTO ->
+                journalSiteDTO.getJournalHeaders().get(0).getJournalContents().stream().forEach(journalContentDTO ->
+                        set.add(journalContentDTO.getStudent().getSurname() + " " + journalContentDTO.getStudent().getName() + "." +
+                                journalContentDTO.getStudent().getPatronymic() + "."))));
+        set.stream().forEach(studentName -> {
+            Map<String, Boolean> stringBooleanMap = new HashMap<>();
+            Map<LocalDate, Map<String, Boolean>> mapDate = new HashMap<>();
+            map.keySet().stream().forEach(date -> {
+                    map.get(date).stream().forEach(journalSiteDTO -> journalSiteDTO.getJournalHeaders().get(0).getJournalContents().stream().forEach(journalContentDTO -> {
+                        if ((journalContentDTO.getStudent().getSurname() + " " + journalContentDTO.getStudent().getName() + "." +
+                                journalContentDTO.getStudent().getPatronymic() + ".").equals(studentName)) {
+                            stringBooleanMap.put(journalSiteDTO.getDiscipline().getName(), journalContentDTO.getPresence());
+                        }
+                    }));
+                    mapDate.put(date, stringBooleanMap);
+            });
+            map1.put(studentName, mapDate);
+        });
+        return map1;
     }
 }

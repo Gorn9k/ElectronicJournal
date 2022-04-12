@@ -132,8 +132,6 @@ public class ElectronicJournalApplication {
                     }
 
                      */
-
-
                     else if (i == 0 && j == 1) {
                         cell.setCellValue(groupName);
                     } else if (i == 2 && j == 2) {
@@ -232,13 +230,22 @@ public class ElectronicJournalApplication {
                                         forde++ < map.get(excel1.getDates().get(newpage)).size()) {
                                     try {
                                         JournalContentDTO journalContent = map.get(excel1.getDates().get(newpage)).
-                                                get(inx++).getJournalHeaders().get(0).getJournalContents().get(rte);
+                                                get(inx).getJournalHeaders().get(0).getJournalContents().get(rte);
+                                        //System.out.println(excel1.getDates().get(newpage));
+                                        //System.out.println(map.get(excel1.getDates().get(newpage)).
+                                        //        get(inx).getDiscipline().getName());
+                                        //System.out.println(journalContent.getStudent().getSurname());
+                                        //System.out.println(journalContent.getPresence());
                                         if (journalContent.getPresence() == null || journalContent.getPresence().equals(false)) {
                                             cell.setCellValue(2);
                                         } else {
                                             cell.setCellValue("");
                                         }
+                                        inx++;
                                     } catch (Exception e) {
+                                        CellReference cellReference = new CellReference(cell);
+                                        System.out.println(cellReference.formatAsString());
+                                        inx++;
                                         cell.setCellValue("");
                                     }
 
@@ -257,8 +264,8 @@ public class ElectronicJournalApplication {
                             newpage++;
                         }
                     }
-                    j++;
 
+                    j++;
                 }
                 if (i >= 11) {
                     rte++;

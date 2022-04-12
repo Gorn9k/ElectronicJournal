@@ -43,6 +43,9 @@ public class UtilController {
         Workbook workbook = ElectronicJournalApplication.getExcel(ElectronicJournalApplication.cat, groupName);
         OutputStream outputStream = response.getOutputStream();
 
+        workbook.getCreationHelper().createFormulaEvaluator().clearAllCachedResultValues();
+        workbook.setForceFormulaRecalculation(true);
+
         workbook.write(outputStream);
         workbook.close();
         outputStream.flush();
