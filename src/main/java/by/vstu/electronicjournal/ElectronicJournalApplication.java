@@ -26,7 +26,6 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-package by.vstu.electronicjournal;
 
 import by.vstu.electronicjournal.dto.*;
 import by.vstu.electronicjournal.entity.JournalContent;
