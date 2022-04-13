@@ -203,8 +203,7 @@ public class ElectronicJournalApplication {
                         }
                     } else if (i >= 11 && i <= 50 && j >= 0 && j < 72) {
 
-                        if (j == 0 && map.get(excel1.getDates().get(0)).
-                                get(0).getJournalHeaders().get(0).getJournalContents().size() > rte) {
+                        if (j == 0 && setForStudents.size() > rte) {
                             cell.setCellValue(rte + 1);
                         }
                         if (j == 1) {
