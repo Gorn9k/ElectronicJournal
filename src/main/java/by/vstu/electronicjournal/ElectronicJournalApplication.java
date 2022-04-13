@@ -107,6 +107,9 @@ public class ElectronicJournalApplication {
                 for (Cell cell : row) {
                     if (index == 0) {
                         if ((i == 0 && j == 1) || (i >= 11 && i <= 50 && j >= 0 && j < 2)) {
+                            if (i == 0 && j == 1) {
+                                cell.setCellValue(groupName);
+                            }
                             if (j == 0 && (i >= 11 && i <= 50)) {
                                 if (setForStudents.size() > nomer) {
                                     cell.setCellValue(nomer + 1);
