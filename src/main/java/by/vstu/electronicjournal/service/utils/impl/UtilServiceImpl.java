@@ -58,18 +58,22 @@ public class UtilServiceImpl implements UtilService {
 	public void generateJournalHeadersEveryDay() {
 
 		int year = 0, month = 0, dayOfMonth;
-		LocalDate after;
-		String query = "2022-04-13and";
+		LocalDate after, before;
+		String query = "2022-04-13and2022-04-13";
 		year = Integer.parseInt(query.split("-")[0]);
 		month = Integer.parseInt(query.split("-")[1]);
 		dayOfMonth = Integer.parseInt(query.split("-")[2].split("and")[0]);
 		after = LocalDate.of(year, month, dayOfMonth);
+		year = Integer.parseInt(query.split("-")[2].split("and")[1]);
+		month = Integer.parseInt(query.split("-")[3]);
+		dayOfMonth = Integer.parseInt(query.split("-")[4]);
+		before = LocalDate.of(year, month, dayOfMonth).plusDays(1);
 
 		List<ContentDTO> usedContentDTOS = new ArrayList<>();
 
 		System.out.println(LocalTime.now());
-
-			for (ContentDTO dto : getContentFromTimetable(after)) {
+		for (LocalDate date = after; date.isBefore(before); date = date.plusDays(1)) {
+			for (ContentDTO dto : getContentFromTimetable(date)) {
 
 				List<JournalSiteDTO> siteDTOS = journalSiteService.search(
 						String.format(
@@ -89,7 +93,7 @@ public class UtilServiceImpl implements UtilService {
 						try {
 							if (!journalHeaderDTO.getTypeClass().getName().equals(dto.getTypeClassName()) ||
 									!journalHeaderDTO.getSubGroup().equals(dto.getSubGroup()) || !journalHeaderDTO.getHoursCount().equals(dto.getLessonNumber())
-									|| journalHeaderDTO.getDateOfLesson().isEqual(after)) {
+									|| journalHeaderDTO.getDateOfLesson().isEqual(date)) {
 								flag = true;
 							}
 						} catch (NullPointerException e) {
@@ -119,7 +123,7 @@ public class UtilServiceImpl implements UtilService {
 					}
 				}
 			}
-
+		}
 	}
 
 	private LinkedList<ContentDTO> getContentFromTimetable(LocalDate date) {
