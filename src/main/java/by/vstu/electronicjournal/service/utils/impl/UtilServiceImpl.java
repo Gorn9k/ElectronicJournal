@@ -17,6 +17,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -32,139 +33,126 @@ import org.springframework.web.client.RestTemplate;
 @EnableScheduling
 public class UtilServiceImpl implements UtilService {
 
-	@Value("${entrance.timetable}")
-	private String path;
+    @Value("${entrance.timetable}")
+    private String path;
 
-	@Autowired
-	private JournalSiteService journalSiteService;
+    @Autowired
+    private JournalSiteService journalSiteService;
 
-	@Autowired
-	private JournalHeaderService journalHeaderService;
+    @Autowired
+    private JournalHeaderService journalHeaderService;
 
-	@Autowired
-	private JournalContentService journalContentService;
+    @Autowired
+    private JournalContentService journalContentService;
 
-	@Autowired
-	private TypeClassService typeClassService;
+    @Autowired
+    private TypeClassService typeClassService;
 
 
-	@Override
-	public void generate() {
-		journalContentService.generate(journalHeaderService.generate(journalSiteService.generate()));
-	}
+    @Override
+    public void generate() {
+        journalContentService.generate(journalHeaderService.generate(journalSiteService.generate()));
+    }
 
-	@Scheduled(cron = "0 0 7 * * *")
-	@Override
-	public void generateJournalHeadersEveryDay() {
+    @Scheduled(cron = "0 0 7 * * *")
+    @Override
+    public void generateJournalHeadersEveryDay() {
 
-		int year = 0, month = 0, dayOfMonth;
-		LocalDate after, before;
-		String query = "2022-04-13and2022-04-13";
-		year = Integer.parseInt(query.split("-")[0]);
-		month = Integer.parseInt(query.split("-")[1]);
-		dayOfMonth = Integer.parseInt(query.split("-")[2].split("and")[0]);
-		after = LocalDate.of(year, month, dayOfMonth);
-		year = Integer.parseInt(query.split("-")[2].split("and")[1]);
-		month = Integer.parseInt(query.split("-")[3]);
-		dayOfMonth = Integer.parseInt(query.split("-")[4]);
-		before = LocalDate.of(year, month, dayOfMonth).plusDays(1);
+        List<ContentDTO> usedContentDTOS = new ArrayList<>();
 
-		List<ContentDTO> usedContentDTOS = new ArrayList<>();
+        System.out.println(LocalTime.now());
+		
+        for (ContentDTO dto : getContentFromTimetable(now())) {
 
-		System.out.println(LocalTime.now());
-		for (LocalDate date = after; date.isBefore(before); date = date.plusDays(1)) {
-			for (ContentDTO dto : getContentFromTimetable(date)) {
+            List<JournalSiteDTO> siteDTOS = journalSiteService.search(
+                    String.format(
+                            "discipline.name==\'%s\';teacher.surname==%s;teacher.name==%s*;teacher.patronymic==%s*;group.name==\'%s\'",
+                            dto.getDisciplineName(),
+                            dto.getTeacherFio().split(" ")[0],
+                            dto.getTeacherFio().split(" ")[1],
+                            dto.getTeacherFio().split(" ")[2],
+                            dto.getGroupName()
+                    )
+            );
+            for (JournalSiteDTO journalSiteDTO : siteDTOS) {
 
-				List<JournalSiteDTO> siteDTOS = journalSiteService.search(
-						String.format(
-								"discipline.name==\'%s\';teacher.surname==%s;teacher.name==%s*;teacher.patronymic==%s*;group.name==\'%s\'",
-								dto.getDisciplineName(),
-								dto.getTeacherFio().split(" ")[0],
-								dto.getTeacherFio().split(" ")[1],
-								dto.getTeacherFio().split(" ")[2],
-								dto.getGroupName()
-						)
-				);
-				for (JournalSiteDTO journalSiteDTO : siteDTOS) {
+                boolean flag = false;
 
-					boolean flag = false;
+                for (JournalHeaderDTO journalHeaderDTO : journalSiteDTO.getJournalHeaders()) {
+                    try {
+                        if (!journalHeaderDTO.getTypeClass().getName().equals(dto.getTypeClassName()) ||
+                                !journalHeaderDTO.getSubGroup().equals(dto.getSubGroup()) || !journalHeaderDTO.getHoursCount().equals(dto.getLessonNumber())
+                                || journalHeaderDTO.getDateOfLesson().isEqual(now())) {
+                            flag = true;
+                        }
+                    } catch (NullPointerException e) {
+                        continue;
+                    }
 
-					for (JournalHeaderDTO journalHeaderDTO : journalSiteDTO.getJournalHeaders()) {
-						try {
-							if (!journalHeaderDTO.getTypeClass().getName().equals(dto.getTypeClassName()) ||
-									!journalHeaderDTO.getSubGroup().equals(dto.getSubGroup()) || !journalHeaderDTO.getHoursCount().equals(dto.getLessonNumber())
-									|| journalHeaderDTO.getDateOfLesson().isEqual(date)) {
-								flag = true;
-							}
-						} catch (NullPointerException e) {
-							continue;
-						}
+                }
 
-					}
+                if (flag) {
+                    continue;
+                }
 
-					if (flag) {
-						continue;
-					}
+                if (usedContentDTOS.isEmpty() || !usedContentDTOS.contains(dto)) {
+                    usedContentDTOS.add(dto);
+                    ParamsForCreateJournalHeader params = new ParamsForCreateJournalHeader();
+                    JournalHeaderDTO journalHeaderDTO = new JournalHeaderDTO();
+                    journalHeaderDTO.setHoursCount(dto.getLessonNumber());
+                    journalHeaderDTO.setSubGroup(dto.getSubGroup());
+                    journalHeaderDTO.setDateOfLesson(dto.getLessonDate());
+                    journalHeaderDTO.setTypeClass(
+                            typeClassService.validator("name==\'" + dto.getTypeClassName() + "\'").get(0));
 
-					if (usedContentDTOS.isEmpty() || !usedContentDTOS.contains(dto)) {
-						usedContentDTOS.add(dto);
-						ParamsForCreateJournalHeader params = new ParamsForCreateJournalHeader();
-						JournalHeaderDTO journalHeaderDTO = new JournalHeaderDTO();
-						journalHeaderDTO.setHoursCount(dto.getLessonNumber());
-						journalHeaderDTO.setSubGroup(dto.getSubGroup());
-						journalHeaderDTO.setDateOfLesson(dto.getLessonDate());
-						journalHeaderDTO.setTypeClass(
-								typeClassService.validator("name==\'" + dto.getTypeClassName() + "\'").get(0));
+                    params.setJournalSiteId(journalSiteDTO.getId());
+                    params.setJournalHeaderDTO(journalHeaderDTO);
 
-						params.setJournalSiteId(journalSiteDTO.getId());
-						params.setJournalHeaderDTO(journalHeaderDTO);
+                    journalHeaderService.create(params);
+                }
+            }
+        }
+    }
 
-						journalHeaderService.create(params);
-					}
-				}
-			}
-		}
-	}
+    private LinkedList<ContentDTO> getContentFromTimetable(LocalDate date) {
+        RestTemplate restTemplate = new RestTemplate();
 
-	private LinkedList<ContentDTO> getContentFromTimetable(LocalDate date) {
-		RestTemplate restTemplate = new RestTemplate();
+        String query = String.format("%s/content/search?q=lessonDate==%s",
+                path,
+                date
+        );
+        LinkedList<ContentDTO> contentDTOS =
+                restTemplate.exchange(query, HttpMethod.GET, null,
+                        new ParameterizedTypeReference<LinkedList<ContentDTO>>() {
+                        }).getBody();
 
-		String query = String.format("%s/content/search?q=lessonDate==%s",
-				path,
-				date
-		);
-		LinkedList<ContentDTO> contentDTOS =
-				restTemplate.exchange(query, HttpMethod.GET, null,
-						new ParameterizedTypeReference<LinkedList<ContentDTO>>() {
-						}).getBody();
+        for (ContentDTO dto : contentDTOS) {
+            if (dto.getChanges() != null) {
+                if (!dto.getChanges().getPostponed().isEqual(now())) {
+                    contentDTOS.remove(dto);
+                    continue;
+                }
+                if (dto.getChanges().getCanceled() != null && dto.getChanges().getPostponed()
+                        .isEqual(null)) {
+                    contentDTOS.remove(dto);
+                    continue;
+                }
+            }
+        }
 
-		for (ContentDTO dto : contentDTOS) {
-			if (dto.getChanges() != null) {
-				if (!dto.getChanges().getPostponed().isEqual(now())) {
-					contentDTOS.remove(dto);
-					continue;
-				}
-				if (dto.getChanges().getCanceled() != null && dto.getChanges().getPostponed()
-						.isEqual(null)) {
-					contentDTOS.remove(dto);
-					continue;
-				}
-			}
-		}
+        query = String.format("%s/content/search?q=changes.postponed==%s",
+                path,
+                date
+        );
 
-		query = String.format("%s/content/search?q=changes.postponed==%s",
-				path,
-				date
-		);
+        LinkedList<ContentDTO> postponedContentDTO =
+                restTemplate.exchange(query, HttpMethod.GET, null,
+                        new ParameterizedTypeReference<LinkedList<ContentDTO>>() {
+                        }).getBody();
 
-		LinkedList<ContentDTO> postponedContentDTO =
-				restTemplate.exchange(query, HttpMethod.GET, null,
-						new ParameterizedTypeReference<LinkedList<ContentDTO>>() {
-						}).getBody();
+        contentDTOS.addAll(postponedContentDTO);
 
-		contentDTOS.addAll(postponedContentDTO);
-
-		return contentDTOS;
-	}
+        return contentDTOS;
+    }
 }
 
