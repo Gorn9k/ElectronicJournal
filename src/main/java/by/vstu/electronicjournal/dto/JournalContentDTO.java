@@ -14,8 +14,8 @@ public class JournalContentDTO extends AbstractDTO implements Comparable<Journal
 
     @Override
     public int compareTo(JournalContentDTO o) {
-        return (student.getSurname() + " " + student.getName().toUpperCase().charAt(0) +
-                "." + student.getPatronymic().toUpperCase().charAt(0)).compareTo(o.student.getSurname() + " " + o.student.getName().toUpperCase().charAt(0) +
-                "." + o.student.getPatronymic().toUpperCase().charAt(0));
+        return (student.getSurname() + " " + student.getName() + " " +
+                (student.getPatronymic() == null ? "" : student.getPatronymic())).compareTo(o.student.getSurname() + " " + o.student.getName() +
+                        (o.student.getPatronymic() == null ? "" : o.student.getPatronymic()));
     }
 }

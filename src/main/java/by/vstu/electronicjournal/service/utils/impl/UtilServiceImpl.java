@@ -61,7 +61,7 @@ public class UtilServiceImpl implements UtilService {
         List<ContentDTO> usedContentDTOS = new ArrayList<>();
 
         System.out.println(LocalTime.now());
-		
+
         for (ContentDTO dto : getContentFromTimetable(now())) {
 
             List<JournalSiteDTO> siteDTOS = journalSiteService.search(

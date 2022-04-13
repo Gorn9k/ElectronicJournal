@@ -87,19 +87,15 @@ public class excel1 {
         excel1.setJournalSites(journalSites);
         excel1.setMap(map);
         excel1.setDates(dates);
-        /*method(map).entrySet().stream().forEach(stringListEntry -> {
-            System.out.println(stringListEntry.getKey());
-            stringListEntry.getValue().entrySet().stream().forEach(stringBooleanEntry -> {
-                System.out.println(stringBooleanEntry.getKey());
-                stringBooleanEntry.getValue().entrySet().stream().forEach(stringBooleanEntry1 -> {
-                    System.out.println(stringBooleanEntry1.getKey().getTeacher().getSurname());
-                    System.out.println(stringBooleanEntry1.getKey().getDiscipline().getName());
-                    System.out.println(stringBooleanEntry1.getValue());
-                });
-            });
+        /*map.entrySet().stream().forEach(localDateListEntry -> {
+            System.out.println(localDateListEntry.getKey());
+            localDateListEntry.getValue().stream().forEach(journalSiteDTO ->
+                    System.out.println(journalSiteDTO.getTeacher().getSurname() + " " + journalSiteDTO.getJournalHeaders().size()));
         });
 
          */
+
+
 
 
 
