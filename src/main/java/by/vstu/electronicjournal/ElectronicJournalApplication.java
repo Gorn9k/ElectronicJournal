@@ -5,11 +5,13 @@ import by.vstu.electronicjournal.entity.JournalContent;
 import by.vstu.electronicjournal.entity.JournalSite;
 import by.vstu.electronicjournal.entity.Teacher;
 import by.vstu.electronicjournal.service.utils.exсel.excel1;
+import by.vstu.electronicjournal.service.utils.exсel.excel2;
 import liquibase.pro.packaged.A;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -63,7 +65,7 @@ public class ElectronicJournalApplication {
     }
 
     public static Workbook getExcel(ConfigurableApplicationContext cat, String groupName) throws IOException {
-        FileInputStream fileInputStream = new FileInputStream("C:/GornakA/excel/example.xlsx");
+        FileInputStream fileInputStream = new FileInputStream("example.xlsx");
         Workbook wb = new XSSFWorkbook(fileInputStream);
         List<CellReference> referenceList = new ArrayList<>();
         excel1 excel1 = cat.getBean(excel1.class);
@@ -107,6 +109,9 @@ public class ElectronicJournalApplication {
                 for (Cell cell : row) {
                     if (index == 0) {
                         if ((i == 0 && j == 1) || (i >= 11 && i <= 50 && j >= 0 && j < 2)) {
+                            if (i == 0 && j == 1) {
+                                cell.setCellValue(groupName);
+                            }
                             if (j == 0 && (i >= 11 && i <= 50)) {
                                 if (setForStudents.size() > nomer) {
                                     cell.setCellValue(nomer + 1);
@@ -132,7 +137,8 @@ public class ElectronicJournalApplication {
                     } else if (i == 3 && j >= 2 && j < 72) {
                         if (excel1.getDates().size() > indexForDate && map.get(excel1.getDates().get(indexForDate)).size() > indexForTeacher && j % 2 == 0) {
                             TeacherDTO teacher = map.get(excel1.getDates().get(indexForDate)).get(indexForTeacher++).getTeacher();
-                            cell.setCellValue(teacher.getSurname() + " " + teacher.getName().charAt(0) + "." + teacher.getPatronymic().charAt(0) + ".");
+                            cell.setCellValue(teacher.getSurname() + " " + teacher.getName().charAt(0) + "." +
+                                    (teacher.getPatronymic() == null ? "" : teacher.getPatronymic().charAt(0) + "."));
                         } else {
                             cell.setCellValue("");
                             cell.getCellStyle().setFillForegroundColor(IndexedColors.WHITE.getIndex());
@@ -203,8 +209,7 @@ public class ElectronicJournalApplication {
                         }
                     } else if (i >= 11 && i <= 50 && j >= 0 && j < 72) {
 
-                        if (j == 0 && map.get(excel1.getDates().get(0)).
-                                get(0).getJournalHeaders().get(0).getJournalContents().size() > rte) {
+                        if (j == 0 && setForStudents.size() > rte) {
                             cell.setCellValue(rte + 1);
                         }
                         if (j == 1) {

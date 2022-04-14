@@ -42,4 +42,5 @@ public interface JournalSiteService extends CRUDService<JournalSiteDTO>, RSQLSea
 
     AcademicPerformanceDTO getStudentOverralGPAById(String query);
 
+    List<JournalSiteDTO> getByDisciplineName(String disciplineName);
 }

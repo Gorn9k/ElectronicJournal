@@ -9,4 +9,6 @@ import java.util.List;
 
 public interface JournalSiteRepository extends JpaRepository<JournalSite, Long>, JpaSpecificationExecutor<JournalSite> {
     List<JournalSite> findByTeacherIdFromSourceAndGroupNameAndDisciplineId(Long teacherIdFromSource, String groupName, Long disciplineId);
+
+    List<JournalSite> findByDisciplineName(String disciplineName);
 }
