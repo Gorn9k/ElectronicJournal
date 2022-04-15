@@ -155,6 +155,11 @@ public class JournalSiteServiceImpl
     }
 
     @Override
+    public List<JournalSiteDTO> getByDisciplineName(String disciplineName) {
+        return mapper.toDTOs(journalSiteRepository.findByDisciplineName(disciplineName), JournalSiteDTO.class);
+    }
+
+    @Override
     public List<JournalSite> generate() {
 
         RestTemplate restTemplate = new RestTemplate();

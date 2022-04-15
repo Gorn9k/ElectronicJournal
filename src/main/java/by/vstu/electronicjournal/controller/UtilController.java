@@ -2,6 +2,7 @@ package by.vstu.electronicjournal.controller;
 
 import by.vstu.electronicjournal.ElectronicJournalApplication;
 import by.vstu.electronicjournal.service.utils.UtilService;
+import by.vstu.electronicjournal.service.utils.exсel.excel2;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -44,6 +45,26 @@ public class UtilController {
 
         workbook.getCreationHelper().createFormulaEvaluator().clearAllCachedResultValues();
         workbook.setForceFormulaRecalculation(true);
+
+        workbook.write(outputStream);
+        workbook.close();
+        outputStream.flush();
+        outputStream.close();
+
+    }
+
+    @GetMapping("mySecondExcel")
+    public void getSecondExcel(HttpServletResponse response, @RequestParam String cathedra) throws IOException {
+
+        //тут дальше создаем файл
+        response.setHeader("Content-Disposition", "inline;filename=\"" + URLEncoder.encode("secondNew.xlsx", "UTF-8") + "\"");
+        response.setContentType("application/xlsx");
+
+        Workbook workbook = excel2.getSecondExcel(ElectronicJournalApplication.cat, cathedra);
+        OutputStream outputStream = response.getOutputStream();
+
+        //workbook.getCreationHelper().createFormulaEvaluator().clearAllCachedResultValues();
+        //workbook.setForceFormulaRecalculation(true);
 
         workbook.write(outputStream);
         workbook.close();

@@ -5,11 +5,13 @@ import by.vstu.electronicjournal.entity.JournalContent;
 import by.vstu.electronicjournal.entity.JournalSite;
 import by.vstu.electronicjournal.entity.Teacher;
 import by.vstu.electronicjournal.service.utils.exсel.excel1;
+import by.vstu.electronicjournal.service.utils.exсel.excel2;
 import liquibase.pro.packaged.A;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -67,7 +69,7 @@ public class ElectronicJournalApplication {
         Workbook wb = new XSSFWorkbook(fileInputStream);
         List<CellReference> referenceList = new ArrayList<>();
         excel1 excel1 = cat.getBean(excel1.class);
-        Map<LocalDate, List<JournalSiteDTO>> map = excel1.getInfo(String.format("group.name==%s;dateOfLesson==%sand%s", groupName, "2022-03-21", "2022-04-13")).getMap();
+        Map<LocalDate, List<JournalSiteDTO>> map = excel1.getInfo(String.format("group.name==%s;dateOfLesson==%sand%s", groupName, "2022-03-21", "2022-04-15")).getMap();
         int indexForDate = 0;
         int indexForDateTemp = 0;
         int indexForDateDiscp = 0;
@@ -135,7 +137,8 @@ public class ElectronicJournalApplication {
                     } else if (i == 3 && j >= 2 && j < 72) {
                         if (excel1.getDates().size() > indexForDate && map.get(excel1.getDates().get(indexForDate)).size() > indexForTeacher && j % 2 == 0) {
                             TeacherDTO teacher = map.get(excel1.getDates().get(indexForDate)).get(indexForTeacher++).getTeacher();
-                            cell.setCellValue(teacher.getSurname() + " " + teacher.getName().charAt(0) + "." + teacher.getPatronymic().charAt(0) + ".");
+                            cell.setCellValue(teacher.getSurname() + " " + teacher.getName().charAt(0) + "." +
+                                    (teacher.getPatronymic() == null ? "" : teacher.getPatronymic().charAt(0) + "."));
                         } else {
                             cell.setCellValue("");
                             cell.getCellStyle().setFillForegroundColor(IndexedColors.WHITE.getIndex());
