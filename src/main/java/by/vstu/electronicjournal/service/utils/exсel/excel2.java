@@ -10,6 +10,7 @@ import liquibase.pro.packaged.S;
 import lombok.Data;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.PropertyTemplate;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -127,15 +128,26 @@ public class excel2 {
         cellStyle1.setVerticalAlignment(VerticalAlignment.CENTER);
         cellStyle1.setWrapText(true);
 
+        CellStyle cellStyle2 = wb.createCellStyle();
+        cellStyle2.setAlignment(HorizontalAlignment.LEFT);
+        cellStyle2.setVerticalAlignment(VerticalAlignment.CENTER);
+        cellStyle2.setWrapText(true);
+
         for (Row row : wb.getSheetAt(0)){
             for (Cell cell : row){
                 if (cell.getColumnIndex() == 6) {
                     cell.setCellStyle(cellStyle1);
+                } else if (cell.getColumnIndex() == 4) {
+                    cell.setCellStyle(cellStyle2);
                 } else {
                     cell.setCellStyle(cellStyle);
                 }
             }
         }
+        PropertyTemplate propertyTemplate=new PropertyTemplate();
+        propertyTemplate.drawBorders(new CellRangeAddress(0,wb.getSheetAt(0).getLastRowNum(),0,8),
+                BorderStyle.THIN,BorderExtent.ALL);
+        propertyTemplate.applyBorders(wb.getSheetAt(0));
 
         fileInputStream.close();
         return wb;
@@ -150,7 +162,7 @@ public class excel2 {
                 int countOfSudents = journalSiteDTO.getJournalHeaders().get(0).getJournalContents().size();
                 countOfSudentsForDate = countOfSudentsForDate + countOfSudents;
                 Row row = workbook.getSheetAt(0).createRow(i);
-                if (i + countOfSudents - 1 - 1 > i) {
+                if (i + countOfSudents - 1 > i) {
                     workbook.getSheetAt(0).addMergedRegion(new CellRangeAddress(
                             i, //first row (0-based)
                             i + countOfSudents - 1, //last row  (0-based)
