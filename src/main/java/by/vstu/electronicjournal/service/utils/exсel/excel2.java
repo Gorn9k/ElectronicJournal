@@ -35,20 +35,18 @@ public class excel2 {
     private static List<JournalHeaderDTO> journalHeaders;
 
     public static void setSecondInfo(ConfigurableApplicationContext cat, String cathedraName) {
-        RestTemplate restTemplate = new RestTemplate();
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        //RestTemplate restTemplate = new RestTemplate();
+        //ObjectMapper objectMapper = new ObjectMapper();
+        //objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         String query = String.format("%s/common-info/disciplines/search?q=department.shortName==%s", "http://192.168.11.252:8082", cathedraName);
-        List<DisciplineDTO> disciplineDTOS = new ArrayList<>();
-        restTemplate.exchange(query, HttpMethod.GET, null, new ParameterizedTypeReference<List<DisciplineDTO>>() {
-        }).getBody().stream().forEach(entry -> {
-            disciplineDTOS.add(objectMapper.convertValue(entry, DisciplineDTO.class));
-        });
+        //List<DisciplineDTO> disciplineDTOS = new ArrayList<>();
+       //restTemplate.exchange(query, HttpMethod.GET, null, new ParameterizedTypeReference<List<DisciplineDTO>>() {
+        //}).getBody().stream().forEach(entry -> {
+         //   disciplineDTOS.add(objectMapper.convertValue(entry, DisciplineDTO.class));
+        //});
         JournalSiteService journalSiteService = cat.getBean(JournalSiteService.class);
         List<JournalSiteDTO> journalSiteDTOs = new ArrayList<>();
-        disciplineDTOS.forEach(disciplineDTO ->
-            journalSiteDTOs.addAll(journalSiteService.getByDisciplineName(disciplineDTO.getName())));
-
+        journalSiteDTOs.addAll(journalSiteService.search("group.name=in=(Тм-34, Тээ-5, Тт-5, Тм-33, Тээ-4, Тт-4, Тм-32, Тээ-3, Тт-3, А-35, Ит-11, Км-5, А-34, Ит-10, Км-4, А-33, Ит-8, Ит-9, Км-3, Ит-6, Ит-7)"));
         int year = 0, month = 0, dayOfMonth;
         LocalDate after, before;
         query = "2022-03-21and2022-04-13";
@@ -81,13 +79,13 @@ public class excel2 {
                 journalSiteDTO1.setGroup(journalSiteDTO.getGroup());
                 journalHeaders = new ArrayList<>(journalSiteDTO.getJournalHeaders());
                 journalHeaders = journalHeaders.stream().filter(journalHeaderDTO -> journalHeaderDTO.getDateOfLesson() != null &&
-                        journalHeaderDTO.getDateOfLesson().equals(finalDate)).collect(Collectors.toList());
-                journalSiteDTO1.setJournalHeaders(journalHeaders);
-                if (journalSiteDTO1.getJournalHeaders().size() != 0) {
+                        journalHeaderDTO.getDateOfLesson().equals(finalDate) && !journalHeaderDTO.getTypeClass().getName().equals("Лекция")).collect(Collectors.toList());
+                if (journalHeaders.size() != 0) {
                     journalHeaders.stream().forEach(journalHeaderDTO -> journalHeaderDTO.setJournalContents(journalHeaderDTO.getJournalContents().stream().
                             filter(journalContentDTO -> journalContentDTO.getPresence()==null || journalContentDTO.getPresence().equals(false)).collect(Collectors.toList())));
                     journalHeaders = journalHeaders.stream().filter(journalHeaderDTO -> journalHeaderDTO.getJournalContents().size() > 0).collect(Collectors.toList());
-                    if (journalSiteDTO1.getJournalHeaders().size() != 0) {
+                    if (journalHeaders.size() != 0) {
+                        journalSiteDTO1.setJournalHeaders(journalHeaders);
                         finalJournalSiteDTOList.add(journalSiteDTO1);
                     }
                 }
@@ -102,7 +100,7 @@ public class excel2 {
     public static Workbook getSecondExcel(ConfigurableApplicationContext cat, String cathedraName) throws IOException {
         setSecondInfo(cat, "ИСАП");
 
-        FileInputStream fileInputStream = new FileInputStream("C:/Users/User/Desktop/secondOt4et.xlsx");
+        FileInputStream fileInputStream = new FileInputStream("C:/GornakA/excel/secondOt4et.xlsx");
         Workbook wb = new XSSFWorkbook(fileInputStream);
 
         for (int i = 0; i < 5; i++) {
@@ -117,6 +115,28 @@ public class excel2 {
             }
         }
 
+        CellStyle cellStyle = wb.createCellStyle();
+        cellStyle.setAlignment(HorizontalAlignment.CENTER);
+        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        cellStyle.setWrapText(true);
+        CellStyle cellStyle1 = wb.createCellStyle();
+        CreationHelper createHelper = wb.getCreationHelper();
+        cellStyle1.setDataFormat(
+                createHelper.createDataFormat().getFormat("yyyy-mm-dd"));
+        cellStyle1.setAlignment(HorizontalAlignment.CENTER);
+        cellStyle1.setVerticalAlignment(VerticalAlignment.CENTER);
+        cellStyle1.setWrapText(true);
+
+        for (Row row : wb.getSheetAt(0)){
+            for (Cell cell : row){
+                if (cell.getColumnIndex() == 6) {
+                    cell.setCellStyle(cellStyle1);
+                } else {
+                    cell.setCellStyle(cellStyle);
+                }
+            }
+        }
+
         fileInputStream.close();
         return wb;
     }
@@ -125,53 +145,42 @@ public class excel2 {
         if (!dates.isEmpty()) {
             int indexOfPass = i;
             LocalDate date = dates.remove();
+            int countOfSudentsForDate = 0;
             for (JournalSiteDTO journalSiteDTO : map.get(date)) {
                 int countOfSudents = journalSiteDTO.getJournalHeaders().get(0).getJournalContents().size();
+                countOfSudentsForDate = countOfSudentsForDate + countOfSudents;
                 Row row = workbook.getSheetAt(0).createRow(i);
-                workbook.getSheetAt(0).addMergedRegion(new CellRangeAddress(
-                        i, //first row (0-based)
-                        i + countOfSudents - 1, //last row  (0-based)
-                        0, //first column (0-based)
-                        0  //last column  (0-based)
-                ));
-                workbook.getSheetAt(0).addMergedRegion(new CellRangeAddress(
-                        i, //first row (0-based)
-                        i + countOfSudents - 1, //last row  (0-based)
-                        1, //first column (0-based)
-                        1  //last column  (0-based)
-                ));
-                workbook.getSheetAt(0).addMergedRegion(new CellRangeAddress(
-                        i, //first row (0-based)
-                        i + countOfSudents - 1, //last row  (0-based)
-                        2, //first column (0-based)
-                        2  //last column  (0-based)
-                ));
-                workbook.getSheetAt(0).addMergedRegion(new CellRangeAddress(
-                        i, //first row (0-based)
-                        i + countOfSudents - 1, //last row  (0-based)
-                        3, //first column (0-based)
-                        3  //last column  (0-based)
-                ));
-                workbook.getSheetAt(0).addMergedRegion(new CellRangeAddress(
-                        i, //first row (0-based)
-                        i + countOfSudents - 1, //last row  (0-based)
-                        6, //first column (0-based)
-                        6  //last column  (0-based)
-                ));
-                workbook.getSheetAt(0).addMergedRegion(new CellRangeAddress(
-                        i, //first row (0-based)
-                        i + countOfSudents - 1, //last row  (0-based)
-                        8, //first column (0-based)
-                        8  //last column  (0-based)
-                ));
-                if (indexOfPass==i) {
-                    CellStyle cellStyle = workbook.createCellStyle();
-                    CreationHelper createHelper = workbook.getCreationHelper();
-                    cellStyle.setDataFormat(
-                            createHelper.createDataFormat().getFormat("yyyy-mm-dd"));
-                    Cell cell = row.createCell(6);
-                    cell.setCellValue(date);
-                    cell.setCellStyle(cellStyle);
+                if (i + countOfSudents - 1 - 1 > i) {
+                    workbook.getSheetAt(0).addMergedRegion(new CellRangeAddress(
+                            i, //first row (0-based)
+                            i + countOfSudents - 1, //last row  (0-based)
+                            0, //first column (0-based)
+                            0  //last column  (0-based)
+                    ));
+                    workbook.getSheetAt(0).addMergedRegion(new CellRangeAddress(
+                            i, //first row (0-based)
+                            i + countOfSudents - 1, //last row  (0-based)
+                            1, //first column (0-based)
+                            1  //last column  (0-based)
+                    ));
+                    workbook.getSheetAt(0).addMergedRegion(new CellRangeAddress(
+                            i, //first row (0-based)
+                            i + countOfSudents - 1, //last row  (0-based)
+                            2, //first column (0-based)
+                            2  //last column  (0-based)
+                    ));
+                    workbook.getSheetAt(0).addMergedRegion(new CellRangeAddress(
+                            i, //first row (0-based)
+                            i + countOfSudents - 1, //last row  (0-based)
+                            3, //first column (0-based)
+                            3  //last column  (0-based)
+                    ));
+                    workbook.getSheetAt(0).addMergedRegion(new CellRangeAddress(
+                            i, //first row (0-based)
+                            i + countOfSudents - 1, //last row  (0-based)
+                            8, //first column (0-based)
+                            8  //last column  (0-based)
+                    ));
                 }
                 DisciplineDTO disciplineDTO = journalSiteDTO.getDiscipline();
                 TeacherDTO teacher = journalSiteDTO.getTeacher();
@@ -199,6 +208,14 @@ public class excel2 {
                     row.createCell(5).setCellValue(2);
                 }
             }
+            Cell cell = workbook.getSheetAt(0).getRow(indexOfPass).createCell(6);
+            cell.setCellValue(date);
+            workbook.getSheetAt(0).addMergedRegion(new CellRangeAddress(
+                    indexOfPass, //first row (0-based)
+                    indexOfPass + countOfSudentsForDate - 1, //last row  (0-based)
+                    6, //first column (0-based)
+                    6  //last column  (0-based)
+            ));
             configure(workbook, i);
         }
     }

@@ -65,11 +65,11 @@ public class ElectronicJournalApplication {
     }
 
     public static Workbook getExcel(ConfigurableApplicationContext cat, String groupName) throws IOException {
-        FileInputStream fileInputStream = new FileInputStream("example.xlsx");
+        FileInputStream fileInputStream = new FileInputStream("C:/GornakA/excel/example.xlsx");
         Workbook wb = new XSSFWorkbook(fileInputStream);
         List<CellReference> referenceList = new ArrayList<>();
         excel1 excel1 = cat.getBean(excel1.class);
-        Map<LocalDate, List<JournalSiteDTO>> map = excel1.getInfo(String.format("group.name==%s;dateOfLesson==%sand%s", groupName, "2022-03-21", "2022-04-13")).getMap();
+        Map<LocalDate, List<JournalSiteDTO>> map = excel1.getInfo(String.format("group.name==%s;dateOfLesson==%sand%s", groupName, "2022-03-21", "2022-04-15")).getMap();
         int indexForDate = 0;
         int indexForDateTemp = 0;
         int indexForDateDiscp = 0;
