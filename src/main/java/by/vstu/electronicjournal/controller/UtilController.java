@@ -2,10 +2,9 @@ package by.vstu.electronicjournal.controller;
 
 import by.vstu.electronicjournal.ElectronicJournalApplication;
 import by.vstu.electronicjournal.service.utils.UtilService;
-import by.vstu.electronicjournal.service.utils.exсel.excel2;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import by.vstu.electronicjournal.service.utils.exсel.ExcelService;
+import by.vstu.electronicjournal.service.utils.exсel.ExcelServiceImpl;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +21,8 @@ public class UtilController {
 
     @Autowired
     private UtilService utilService;
+    @Autowired
+    private ExcelService excelService;
 
     @GetMapping("generate")
     public void generate() {
@@ -37,7 +38,7 @@ public class UtilController {
     public void getExcel(HttpServletResponse response, @RequestParam String groupName) throws IOException {
 
         //тут дальше создаем файл
-        response.setHeader("Content-Disposition", "inline;filename=\"" + URLEncoder.encode("new.xlsx", "UTF-8") + "\"");
+        response.setHeader("Content-Disposition", "inline;filename=\"" + URLEncoder.encode("Отчет_по_пропускам.xlsx", "UTF-8") + "\"");
         response.setContentType("application/xlsx");
 
         Workbook workbook = ElectronicJournalApplication.getExcel(ElectronicJournalApplication.cat, groupName);
@@ -54,13 +55,13 @@ public class UtilController {
     }
 
     @GetMapping("mySecondExcel")
-    public void getSecondExcel(HttpServletResponse response, @RequestParam String cathedra) throws IOException {
+    public void getSecondExcel(HttpServletResponse response, @RequestParam String facultyName) throws IOException {
 
         //тут дальше создаем файл
-        response.setHeader("Content-Disposition", "inline;filename=\"" + URLEncoder.encode("secondNew.xlsx", "UTF-8") + "\"");
+        response.setHeader("Content-Disposition", "inline;filename=\"" + URLEncoder.encode("Отчет_по_платным_отработкам_за_месяц.xlsx", "UTF-8") + "\"");
         response.setContentType("application/xlsx");
 
-        Workbook workbook = excel2.getSecondExcel(ElectronicJournalApplication.cat, cathedra);
+        Workbook workbook = excelService.getPerformanceReport(facultyName);
         OutputStream outputStream = response.getOutputStream();
 
         //workbook.getCreationHelper().createFormulaEvaluator().clearAllCachedResultValues();
@@ -68,6 +69,7 @@ public class UtilController {
 
         workbook.write(outputStream);
         workbook.close();
+
         outputStream.flush();
         outputStream.close();
 

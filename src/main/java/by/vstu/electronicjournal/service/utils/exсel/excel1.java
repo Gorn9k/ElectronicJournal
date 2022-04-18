@@ -101,33 +101,4 @@ public class excel1 {
 
         return excel1;
     }
-
-
-    public Map<String, Map<LocalDate, Map<JournalSiteDTO, Boolean>>> method(Map<LocalDate, List<JournalSiteDTO>> map) {
-        Map<String, Map<LocalDate, Map<JournalSiteDTO, Boolean>>> map1 = new HashMap<>();
-        Set<String> set = new TreeSet<>();
-        map.values().stream().forEach(journalSiteDTOS -> journalSiteDTOS.stream().forEach(journalSiteDTO ->
-                journalSiteDTO.getJournalHeaders().get(0).getJournalContents().stream().forEach(journalContentDTO ->
-                        set.add(journalContentDTO.getStudent().getSurname() + " " + journalContentDTO.getStudent().getName().toUpperCase().charAt(0) + "." +
-                                journalContentDTO.getStudent().getPatronymic().toUpperCase().charAt(0) + "."))));
-        set.stream().forEach(studentName -> {
-            Map<JournalSiteDTO, Boolean> stringBooleanMap = new HashMap<>();
-            Map<LocalDate, Map<JournalSiteDTO, Boolean>> mapDate = new HashMap<>();
-            map.keySet().stream().forEach(date -> {
-                    map.get(date).stream().forEach(journalSiteDTO -> journalSiteDTO.getJournalHeaders().get(0).getJournalContents().stream().forEach(journalContentDTO -> {
-                        if ((journalContentDTO.getStudent().getSurname() + " " + journalContentDTO.getStudent().getName().toUpperCase().charAt(0) + "." +
-                                journalContentDTO.getStudent().getPatronymic().toUpperCase().charAt(0) + ".").equals(studentName)) {
-                            stringBooleanMap.put(journalSiteDTO, journalContentDTO.getPresence());
-                        }
-                    }));
-                    mapDate.put(date, stringBooleanMap);
-            });
-            map1.put(studentName, mapDate);
-        });
-        return map1;
-    }
-
-    public void setValue(Cell cell, Map<String, Map<LocalDate, Map<JournalSiteDTO, Boolean>>> map) {
-
-    }
 }
