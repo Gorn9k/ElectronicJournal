@@ -1,42 +1,8 @@
 package by.vstu.electronicjournal;
 
 import by.vstu.electronicjournal.dto.*;
-import by.vstu.electronicjournal.entity.JournalContent;
-import by.vstu.electronicjournal.entity.JournalSite;
-import by.vstu.electronicjournal.entity.Teacher;
 import by.vstu.electronicjournal.service.utils.exсel.excel1;
-import by.vstu.electronicjournal.service.utils.exсel.excel2;
-import liquibase.pro.packaged.A;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellAddress;
-import org.apache.poi.ss.util.CellReference;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.web.client.RestTemplate;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-
-
-import by.vstu.electronicjournal.dto.*;
-import by.vstu.electronicjournal.entity.JournalContent;
-import by.vstu.electronicjournal.entity.JournalSite;
-import by.vstu.electronicjournal.entity.Teacher;
-import by.vstu.electronicjournal.service.utils.exсel.excel1;
-import liquibase.pro.packaged.A;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.boot.SpringApplication;
@@ -47,10 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -65,11 +28,11 @@ public class ElectronicJournalApplication {
     }
 
     public static Workbook getExcel(ConfigurableApplicationContext cat, String groupName) throws IOException {
-        FileInputStream fileInputStream = new FileInputStream("C:/GornakA/excel/example.xlsx");
+        FileInputStream fileInputStream = new FileInputStream("C:/GornakA/excel/Отчет_по_пропускам.xlsx");
         Workbook wb = new XSSFWorkbook(fileInputStream);
         List<CellReference> referenceList = new ArrayList<>();
         excel1 excel1 = cat.getBean(excel1.class);
-        Map<LocalDate, List<JournalSiteDTO>> map = excel1.getInfo(String.format("group.name==%s;dateOfLesson==%sand%s", groupName, "2022-03-21", "2022-04-15")).getMap();
+        Map<LocalDate, List<JournalSiteDTO>> map = excel1.getInfo(String.format("group.name==%s;dateOfLesson==%sand%s", groupName, "2022-03-21", "2022-04-18")).getMap();
         int indexForDate = 0;
         int indexForDateTemp = 0;
         int indexForDateDiscp = 0;
@@ -245,14 +208,14 @@ public class ElectronicJournalApplication {
                                                     indexRow = k;
                                                 }
                                             }
-                                            if (journalContent.getPresence() == null || journalContent.getPresence().equals(false)) {
+                                            if (journalContent.getPresence() != null && journalContent.getPresence().equals(false)) {
                                                 wb.getSheetAt(index).getRow(indexRow + 11).getCell(cell.getColumnIndex()).setCellValue(2);
                                             } else {
                                                 wb.getSheetAt(index).getRow(indexRow + 11).getCell(cell.getColumnIndex()).setCellValue("");
                                             }
                                             cell.setCellValue("");
                                         }
-                                        else if (journalContent.getPresence() == null || journalContent.getPresence().equals(false)) {
+                                        else if (journalContent.getPresence() != null && journalContent.getPresence().equals(false)) {
                                             cell.setCellValue(2);
                                         } else {
                                             cell.setCellValue("");

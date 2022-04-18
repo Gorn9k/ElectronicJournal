@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.NotSupportedException;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.NoSuchElementException;
 
@@ -35,7 +36,8 @@ public class ControllerExceptions {
             EntityExistsException.class,
             NullPointerException.class,
             NotSupportedException.class,
-            ClassCastException.class
+            ClassCastException.class,
+            IOException.class
     })
     public String exceptionHandler(Exception e) {
         return e.getMessage() != null ? e.getMessage() : e.getLocalizedMessage();
