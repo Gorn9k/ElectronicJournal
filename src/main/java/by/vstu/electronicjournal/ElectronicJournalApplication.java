@@ -28,7 +28,7 @@ public class ElectronicJournalApplication {
     }
 
     public static Workbook getExcel(ConfigurableApplicationContext cat, String groupName) throws IOException {
-        FileInputStream fileInputStream = new FileInputStream("C:/GornakA/excel/Отчет_по_пропускам.xlsx");
+        FileInputStream fileInputStream = new FileInputStream("C:/GornakA/excel/Ot4et_po_propyskam.xlsx");
         Workbook wb = new XSSFWorkbook(fileInputStream);
         List<CellReference> referenceList = new ArrayList<>();
         excel1 excel1 = cat.getBean(excel1.class);
