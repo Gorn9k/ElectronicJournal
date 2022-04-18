@@ -45,8 +45,8 @@ public class ExcelServiceImpl implements ExcelService {
     public Workbook getPerformanceReport(String facultyName) {
         setParams(facultyName);
         Workbook wb = null;
-        filePath += "Ot4et_po_platnim_otrabotkam_za_mes9c.xlsx";
-        try (FileInputStream fileInputStream = new FileInputStream(filePath)) {
+        String path = filePath + "Ot4et_po_platnim_otrabotkam_za_mes9c.xlsx";
+        try (FileInputStream fileInputStream = new FileInputStream(path)) {
             wb = new XSSFWorkbook(fileInputStream);
 
             wb.getSheetAt(0).getRow(0).createCell(1).setCellValue("ИСАП");
@@ -88,7 +88,7 @@ public class ExcelServiceImpl implements ExcelService {
                     BorderStyle.THIN, BorderExtent.ALL);
             propertyTemplate.applyBorders(wb.getSheetAt(0));
         } catch (FileNotFoundException fileNotFoundException) {
-            System.out.println("File " + filePath + " not found!");
+            System.out.println("File " + path + " not found!");
         } catch (IOException ioException) {
             System.out.println("Incorrect import excel file!");
         }
