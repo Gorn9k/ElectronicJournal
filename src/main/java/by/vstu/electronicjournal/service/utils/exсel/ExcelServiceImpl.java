@@ -1,26 +1,20 @@
 package by.vstu.electronicjournal.service.utils.exсel;
 
-import by.vstu.electronicjournal.ElectronicJournalApplication;
 import by.vstu.electronicjournal.dto.*;
-import by.vstu.electronicjournal.service.DisciplineService;
 import by.vstu.electronicjournal.service.JournalSiteService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import liquibase.pro.packaged.S;
 import lombok.Data;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.PropertyTemplate;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.hibernate.jdbc.Work;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -45,8 +39,8 @@ public class ExcelServiceImpl implements ExcelService {
     public Workbook getPerformanceReport(String facultyName) {
         setParams(facultyName);
         Workbook wb = null;
-        filePath += "Отчет_по_платным_отработкам_за_месяц.xlsx";
-        try (FileInputStream fileInputStream = new FileInputStream(filePath)) {
+        String path = filePath + "ot4et_po_platnim_otrabotkam_za_mes9c.xlsx";
+        try (FileInputStream fileInputStream = new FileInputStream(path)) {
             wb = new XSSFWorkbook(fileInputStream);
 
             wb.getSheetAt(0).getRow(0).createCell(1).setCellValue("ИСАП");
@@ -88,7 +82,7 @@ public class ExcelServiceImpl implements ExcelService {
                     BorderStyle.THIN, BorderExtent.ALL);
             propertyTemplate.applyBorders(wb.getSheetAt(0));
         } catch (FileNotFoundException fileNotFoundException) {
-            System.out.println("File " + filePath + " not found!");
+            System.out.println("File " + path + " not found!");
         } catch (IOException ioException) {
             System.out.println("Incorrect import excel file!");
         }
@@ -144,7 +138,7 @@ public class ExcelServiceImpl implements ExcelService {
                         journalHeaderDTO.getDateOfLesson().equals(finalDate) && !journalHeaderDTO.getTypeClass().getName().equals("Лекция")).collect(Collectors.toList());
                 if (journalHeaders.size() != 0) {
                     journalHeaders.stream().forEach(journalHeaderDTO -> journalHeaderDTO.setJournalContents(journalHeaderDTO.getJournalContents().stream().
-                            filter(journalContentDTO -> journalContentDTO.getPresence()!=null && journalContentDTO.getPresence().equals(false)).collect(Collectors.toList())));
+                            filter(journalContentDTO -> journalContentDTO.getPresence() != null && journalContentDTO.getPresence().equals(false)).collect(Collectors.toList())));
                     journalHeaders = journalHeaders.stream().filter(journalHeaderDTO -> journalHeaderDTO.getJournalContents().size() > 0).collect(Collectors.toList());
                     if (journalHeaders.size() != 0) {
                         journalSiteDTO1.setJournalHeaders(journalHeaders);
@@ -224,19 +218,18 @@ public class ExcelServiceImpl implements ExcelService {
     @Override
     public Workbook getPassReport(String groupName) {
         Workbook wb = null;
-        filePath += "Отчет_по_пропускам.xlsx";
-        try (FileInputStream fileInputStream = new FileInputStream(filePath)) {
+        String path = filePath + "ot4et_po_propyskam_za_period.xlsx";
+        try (FileInputStream fileInputStream = new FileInputStream(path)) {
             wb = new XSSFWorkbook(fileInputStream);
             setParamsForPassReport(groupName);
-
-
+            toFormPassReport(wb);
         } catch (FileNotFoundException fileNotFoundException) {
-            System.out.println("File " + filePath + " not found!");
+            System.out.println("File " + path + " not found!");
         } catch (IOException ioException) {
             System.out.println("Incorrect import excel file!");
         }
 
-        return null;
+        return wb;
     }
 
     private void setParamsForPassReport(String groupName) {
@@ -271,6 +264,7 @@ public class ExcelServiceImpl implements ExcelService {
                 JournalSiteDTO journalSiteDTO1 = new JournalSiteDTO();
                 journalSiteDTO1.setDiscipline(journalSiteDTO.getDiscipline());
                 journalSiteDTO1.setTeacher(journalSiteDTO.getTeacher());
+                journalSiteDTO1.setGroup(journalSiteDTO.getGroup());
                 journalHeaders = new ArrayList<>(journalSiteDTO.getJournalHeaders());
                 journalHeaders = journalHeaders.stream().filter(journalHeaderDTO -> journalHeaderDTO.getDateOfLesson() != null &&
                         journalHeaderDTO.getDateOfLesson().equals(finalDate)).collect(Collectors.toList());
@@ -285,22 +279,230 @@ public class ExcelServiceImpl implements ExcelService {
     }
 
     private void toFormPassReport(Workbook workbook) {
-        JournalHeaderDTO journalHeaderDTO;
-        journalHeaders = new ArrayList<>();
-
+        int indexForDate = 0;
+        int indexForDateTemp = 0;
+        int indexForDateDiscp = 0;
+        int indexForDateDate = 0;
+        int indexForDateStudent = 0;
+        int rte = 0;
+        int inx = 0;
+        int forde = 0;
+        int ij = 0;
+        int nomer = 0;
+        int newpage = 0;
+        JournalHeaderDTO journalHeaderDTO = new JournalHeaderDTO();
+        List<JournalHeaderDTO> journalHeaderDTOList = new ArrayList<>();
         map.values().stream().forEach(journalSiteDTOS -> journalSiteDTOS.stream().forEach(journalSiteDTO ->
-                journalHeaders.addAll(journalSiteDTO.getJournalHeaders())));
+                journalHeaderDTOList.addAll(journalSiteDTO.getJournalHeaders())));
 
-        int maxSize = journalHeaders.stream().mapToInt(journalHeaderDTO1 ->
+        int maxSize = journalHeaderDTOList.stream().mapToInt(journalHeaderDTO1 ->
                 journalHeaderDTO1.getJournalContents().size()).max().getAsInt();
-
-        journalHeaderDTO = journalHeaders.stream().filter(journalHeaderDTO1 -> journalHeaderDTO1.getJournalContents().size()==maxSize).collect(Collectors.toList()).get(0);
+        journalHeaderDTO = journalHeaderDTOList.stream().filter(journalHeaderDTO1 -> journalHeaderDTO1.getJournalContents().size()==maxSize).collect(Collectors.toList()).get(0);
 
         Set<String> setForStudents = new TreeSet<>(journalHeaderDTO.getJournalContents().stream().map(journalContentDTO ->
                 journalContentDTO.getStudent().getSurname() + " " + journalContentDTO.getStudent().getName().toUpperCase().charAt(0) + "." +
                         (journalContentDTO.getStudent().getPatronymic() == null ? "" : journalContentDTO.getStudent().getPatronymic().toUpperCase().charAt(0) + ".")).collect(Collectors.toList()));
 
+        for (int index = 0; index < workbook.getNumberOfSheets(); index++) {
+            int i = 0, j = 0;
+            int indexForTeacher = 0;
+            inx = 0;
+            indexForDateTemp = indexForDate;
+            indexForDateDiscp = indexForDate;
+            indexForDateDate = indexForDate;
+            indexForDateStudent = indexForDate;
+            forde = 0;
+            rte = 0;
+            for (Row row : workbook.getSheetAt(index)) {
+                String nameForContent = null;
+                for (Cell cell : row) {
+                    if (index == 0) {
+                        if ((i == 0 && j == 1) || (i >= 11 && i <= 46 && j >= 0 && j < 2)) {
+                            if (i == 0 && j == 1) {
+                                cell.setCellValue(map.get(dates.getFirst()).get(0).getGroup().getName());
+                            }
+                            if (j == 0 && (i >= 11 && i <= 46)) {
+                                if (setForStudents.size() > nomer) {
+                                    cell.setCellValue(nomer + 1);
+                                }
+                                if (setForStudents.size() >= nomer) {
+                                    nomer++;
+                                }
 
+                            }
+                            if (j == 1 && (i >= 11 && i <= 46)) {
+                                try {
+                                    String name = new ArrayList<>(setForStudents).get(ij++);
+                                    cell.setCellValue(name);
+                                } catch (Exception e) {
+                                    cell.setCellValue("");
+                                }
+                            }
+                        }
+                    } else if (i == 0 && j == 1) {
+                        cell.setCellValue(map.get(dates.getFirst()).get(0).getGroup().getName());
+                    } else if (i == 2 && j == 2) {
+
+                    } else if (i == 3 && j >= 2 && j < 92) {
+                        if (dates.size() > indexForDate && map.get(dates.get(indexForDate)).size() > indexForTeacher && j % 2 == 0) {
+                            TeacherDTO teacher = map.get(dates.get(indexForDate)).get(indexForTeacher++).getTeacher();
+                            cell.setCellValue(teacher.getSurname() + " " + teacher.getName().charAt(0) + "." +
+                                    (teacher.getPatronymic() == null ? "" : teacher.getPatronymic().charAt(0) + "."));
+                        } else {
+                            cell.setCellValue("");
+                            cell.getCellStyle().setFillForegroundColor(IndexedColors.WHITE.getIndex());
+                        }
+                        if (j % 18 == 0) {
+                            indexForDate++;
+                            indexForTeacher = 0;
+                        }
+                    } else if (i == 4 && j >= 2 && j < 92) {
+                        cell.setCellValue("");
+                        cell.getCellStyle().setFillForegroundColor(IndexedColors.WHITE.getIndex());
+                    } else if (i == 5 && j >= 2 && j < 92) {
+                        if (dates.size() > indexForDateTemp && map.get(dates.get(indexForDateTemp)).size() > indexForTeacher && j % 2 == 0) {
+                            TypeClassDTO typeClassDTO = map.get(dates.get(indexForDateTemp)).get(indexForTeacher++).getJournalHeaders().get(0).getTypeClass();
+                            switch (typeClassDTO.getName()) {
+                                case "Лабораторная работа":
+                                    cell.setCellValue("ЛБ");
+                                    break;
+                                case "Лекция":
+                                    cell.setCellValue("ЛК");
+                                    break;
+                                case "Практическая работа":
+                                    cell.setCellValue("ПР");
+                                    break;
+                                default:
+                                    cell.setCellValue("No info");
+                            }
+
+                        } else {
+                            cell.setCellValue("");
+                            cell.getCellStyle().setFillForegroundColor(IndexedColors.WHITE.getIndex());
+                        }
+                        if (j % 18 == 0) {
+                            indexForDateTemp++;
+                            indexForTeacher = 0;
+                        }
+                    } else if (i == 6 && j >= 2 && j < 92) {
+                        if (dates.size() > indexForDateDiscp && map.get(dates.get(indexForDateDiscp)).size() > indexForTeacher && j % 2 == 0) {
+                            DisciplineDTO disciplineDTO = map.get(dates.get(indexForDateDiscp)).get(indexForTeacher++).getDiscipline();
+                            List<String> strings = Arrays.stream(disciplineDTO.getName().split(" ")).map(s -> {
+                                s = s.toUpperCase();
+                                s = Character.toString(s.charAt(0));
+                                return s;
+                            }).collect(Collectors.toList());
+                            StringBuilder disciplineName = new StringBuilder();
+                            strings.stream().forEach(disciplineName::append);
+                            cell.setCellValue(new String(disciplineName));
+                        } else {
+                            cell.setCellValue("");
+                            cell.getCellStyle().setFillForegroundColor(IndexedColors.WHITE.getIndex());
+                        }
+                        if (j % 18 == 0) {
+                            indexForDateDiscp++;
+                            indexForTeacher = 0;
+                        }
+                    } else if (i == 8 && j >= 2 && j < 92) {
+                        cell.setCellValue("");
+                        cell.getCellStyle().setFillForegroundColor(IndexedColors.WHITE.getIndex());
+                    } else if (i == 9 && j >= 2 && j < 92) {
+                        if (dates.size() > indexForDateDate && j % 2 == 0) {
+                            cell.setCellValue(dates.get(indexForDateDate));
+                        } else {
+                            cell.setCellValue("");
+                            cell.getCellStyle().setFillForegroundColor(IndexedColors.WHITE.getIndex());
+                        }
+                        if (j % 18 == 0) {
+                            indexForDateDate++;
+                        }
+                    } else if (i >= 11 && i <= 36 && j >= 0 && j < 92) {
+
+                        if (j == 0 && setForStudents.size() > rte) {
+                            cell.setCellValue(rte + 1);
+                        }
+                        if (j == 1) {
+                            try {
+                                nameForContent = new ArrayList<>(setForStudents).get(rte);
+                                cell.setCellValue(nameForContent);
+                            } catch (Exception e) {
+                                cell.setCellValue("");
+                            }
+
+                        }
+                        if (j >= 2) {
+                            try {
+                                if (dates.size() + 4 >= indexForDate + indexForDateStudent && map.get(dates.get(newpage)).size() > inx && j % 2 == 0 &&
+                                        forde++ < map.get(dates.get(newpage)).size()) {
+                                    JournalContentDTO journalContent;
+                                    try {
+                                        Set<JournalContentDTO> set = new TreeSet<>(map.get(dates.get(newpage)).
+                                                get(inx).getJournalHeaders().get(0).getJournalContents());
+                                        journalContent = new ArrayList<>(set).get(rte);
+                                        //System.out.println(dates.get(newpage));
+                                        //System.out.println(map.get(dates.get(newpage)).
+                                        //        get(inx).getDiscipline().getName());
+                                        //System.out.println(journalContent.getStudent().getSurname());
+                                        //System.out.println(journalContent.getPresence());
+                                        String nameOfCurrentStudent = journalContent.getStudent().getSurname() + " " + journalContent.getStudent().getName().toUpperCase().charAt(0) +
+                                                "." + (journalContent.getStudent().getPatronymic() == null ? "" : journalContent.getStudent().getPatronymic().toUpperCase().charAt(0) + ".");
+                                        if (!nameOfCurrentStudent.equals(nameForContent)) {
+                                            int indexRow = 0;
+                                            List<String> strings = new ArrayList<>(setForStudents);
+                                            for (int k = 0; k < strings.size(); k++) {
+                                                if (strings.get(k).equals(nameOfCurrentStudent)) {
+                                                    indexRow = k;
+                                                }
+                                            }
+                                            if (journalContent.getPresence() != null && journalContent.getPresence().equals(false)) {
+                                                workbook.getSheetAt(index).getRow(indexRow + 11).getCell(cell.getColumnIndex()).setCellValue(2);
+                                            } else {
+                                                workbook.getSheetAt(index).getRow(indexRow + 11).getCell(cell.getColumnIndex()).setCellValue("");
+                                            }
+                                            cell.setCellValue("");
+                                        }
+                                        else if (journalContent.getPresence() != null && journalContent.getPresence().equals(false)) {
+                                            cell.setCellValue(2);
+                                        } else {
+                                            cell.setCellValue("");
+                                        }
+                                        inx++;
+                                    } catch (Exception e) {
+                                        inx++;
+                                    }
+                                } else {
+                                    cell.setCellValue("");
+                                }
+                            } catch (Exception e) {
+                                cell.setCellValue("");
+                            }
+                        }
+                        if (j != 0 && j % 18 == 0) {
+                            indexForDateStudent++;
+                            forde = 0;
+                            inx = 0;
+                            newpage++;
+                        }
+                    }
+                    j++;
+                }
+                if (i >= 11) {
+                    rte++;
+                }
+                i++;
+                indexForDateStudent = 0;
+                if (index==1) {
+                    newpage = 0;
+                } else {
+                    newpage = indexForDate - 5;
+                }
+                j = 0;
+                inx = 0;
+            }
+            if (index != 0) {
+                indexForDate += 2;
+            }
+        }
     }
 
 }

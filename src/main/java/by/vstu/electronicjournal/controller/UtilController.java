@@ -1,9 +1,7 @@
 package by.vstu.electronicjournal.controller;
 
-import by.vstu.electronicjournal.ElectronicJournalApplication;
 import by.vstu.electronicjournal.service.utils.UtilService;
 import by.vstu.electronicjournal.service.utils.exсel.ExcelService;
-import by.vstu.electronicjournal.service.utils.exсel.ExcelServiceImpl;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,10 +36,10 @@ public class UtilController {
     public void getExcel(HttpServletResponse response, @RequestParam String groupName) throws IOException {
 
         //тут дальше создаем файл
-        response.setHeader("Content-Disposition", "inline;filename=\"" + URLEncoder.encode("Отчет_по_пропускам.xlsx", "UTF-8") + "\"");
+        response.setHeader("Content-Disposition", "inline;filename=\"" + URLEncoder.encode("Отчет_по_пропускам_за_месяц.xlsx", "UTF-8") + "\"");
         response.setContentType("application/xlsx");
 
-        Workbook workbook = ElectronicJournalApplication.getExcel(ElectronicJournalApplication.cat, groupName);
+        Workbook workbook = excelService.getPassReport(groupName);
         OutputStream outputStream = response.getOutputStream();
 
         workbook.getCreationHelper().createFormulaEvaluator().clearAllCachedResultValues();
