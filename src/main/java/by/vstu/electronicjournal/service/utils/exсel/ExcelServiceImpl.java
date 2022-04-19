@@ -416,7 +416,7 @@ public class ExcelServiceImpl implements ExcelService {
                         if (j % 18 == 0) {
                             indexForDateDate++;
                         }
-                    } else if (i >= 11 && i <= 36 && j >= 0 && j < 92) {
+                    } else if (i >= 11 && i <= 46 && j >= 0 && j < 92) {
 
                         if (j == 0 && setForStudents.size() > rte) {
                             cell.setCellValue(rte + 1);
